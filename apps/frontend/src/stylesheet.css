@@ -102,3 +102,47 @@ p {
 #root {
   isolation: isolate;
 }
+
+.colour-box-container{
+    display: flex;
+}
+
+.colour-box-bg,
+.colour-box-banner1,
+.colour-box-banner2,
+.colour-box-text,
+.colour-box-button {
+    border-radius: 15px;      /* Adjust this value for more or less curve */
+    width: 100px;             /* Example width */
+    height: 100px;            /* Example height */
+    padding: 20px;            /* Add some padding for content */
+    color: white;             /* Text color for contrast */
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid #000;
+    color:black;
+    margin: 10px;
+}
+
+.colour-box-bg{
+    background-color: var(--background-colour);
+}
+
+.colour-box-banner1{
+    background-color: var(--banner-colour-1);
+}
+
+.colour-box-banner2{
+    background-color: var(--banner-colour-2);
+}
+
+.colour-box-text{
+    background-color: var(--text-colour);
+
+}
+.colour-box-button{
+    background-color: var(--button-colour);
+}
+
