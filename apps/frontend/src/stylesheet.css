@@ -2,32 +2,32 @@
 @import url('https://fonts.googleapis.com/css2?family=EB+Garamond&display=swap');
 
 :root {
-  --background-colour: #F6F5F4;
-  --text-colour: #595E4E;
-  --banner-colour-1: #C8D7C4;
-  --banner-colour-2: #C8D7C480; /* banner colour with 50% opacity*/
-  --button-colour: #E3EAE1;
+    --background-colour: #F6F5F4;
+    --text-colour: #595E4E;
+    --banner-colour-1: #C8D7C4;
+    --banner-colour-2: #C8D7C480; /*banner colour with 50% opacity*/
+    --button-colour: #E3EAE1;
 
-  --primary-font-web-copy: "EB Garamond"; /*need to import*/
-  --primary-font-body-copy: "Outfit"; /*need to import*/
+    --primary-font-web-copy: "EB Garamond",Georgia, serif;
+    --primary-font-body-copy: "Outfit", Arial, sans-serif;
 }
 
 *,
 *::before,
 *::after {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 * {
-  margin: 0;
+    margin: 0;
 }
 
 body {
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  font-family: var(--primary-font-body-copy);
-  background-color: var(--background-colour);
-  color: var(--text-colour);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    font-family: var(--primary-font-body-copy);
+    background-color: var(--background-colour);
+    color: var(--text-colour);
 }
 
 img,
@@ -35,15 +35,15 @@ picture,
 video,
 canvas,
 svg {
-  display: block;
-  max-width: 100%;
+    display: block;
+    max-width: 100%;
 }
 
 input,
 button,
 textarea,
 select {
-  font: inherit;
+    font: inherit;
 }
 
 p,
@@ -53,46 +53,61 @@ h3,
 h4,
 h5,
 h6 {
-  overflow-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 h1 {
-  font-family: var(--primary-font-web-copy);
-  letter-spacing: 0.1em;
-  font-size: 128px;
-  font-weight: normal;
+    font-family: var(--primary-font-web-copy);
+    letter-spacing: 0.1em;
+    font-size: 128px;
+    font-weight: normal;
 }
 
 h2 {
-  font-family: var(--primary-font-web-copy);
-  font-size: 64px;
-  font-weight:bold;
+    font-family: var(--primary-font-web-copy);
+    font-size: 64px;
+    font-weight:bold;
 }
 
 h3 {
-  font-family: var(--primary-font-web-copy);
-  font-size: 20px;
-  font-weight: bold;
+    font-family: var(--primary-font-web-copy);
+    font-size: 20px;
+    font-weight: bold;
 }
 
 h4 {
-  font-family: var(--primary-font-web-copy);
-  font-size: 16px;
-  font-weight: bold;
+    font-family: var(--primary-font-web-copy);
+    font-size: 16px;
+    font-weight: bold;
 }
 
 h5 {
-  font-size: 20px;
-  font-weight: normal; 
+    font-size: 20px;
+    font-weight: normal; 
 }
 
 h6 {
-  font-size: 16px;
-  font-weight: normal;
+    font-size: 16px;
+    font-weight: normal;
 }
 
 a {
-  text-decoration: underline;
+    text-decoration: underline;
+    color: var(--text-colour);
+    font-family: var(--primary-font-web-copy);
+    font-size: 20px;
+    font-weight: bold;
+}
+
+ul {
+    display: flex;
+    gap: 20px;
+    padding: 0;
+    margin: 0;
+}
+
+li {
+    list-style: none;
 }
 
 p {
@@ -112,11 +127,11 @@ p {
 .colour-box-banner2,
 .colour-box-text,
 .colour-box-button {
-    border-radius: 15px;      /* Adjust this value for more or less curve */
-    width: 100px;             /* Example width */
-    height: 100px;            /* Example height */
-    padding: 20px;            /* Add some padding for content */
-    color: white;             /* Text color for contrast */
+    border-radius: 15px;
+    width: 100px;
+    height: 100px;
+    padding: 20px;
+    color: white;
     text-align: center;
     display: flex;
     justify-content: center;
@@ -146,3 +161,34 @@ p {
     background-color: var(--button-colour);
 }
 
+.banner-link-container{
+    display: flex;
+    justify-content:flex-end;
+    padding-right: 3vw;
+    margin-bottom: 5vh;
+}
+
+.banner-container{
+    width: auto;
+    /* height: 240px; */
+    /* background-color:blue; */
+}
+
+.banner-menu{
+    width: auto;
+    height: 40px;
+    background-color:var(--banner-colour-1);
+    justify-content: center;
+    display:flex;
+    align-items:center;
+}
+
+.banner-image{
+    width: 100%;
+    height: 180px;
+    background: url('./assets/banner-image.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: var(--banner-colour-1);
+}
