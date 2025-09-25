@@ -1,4 +1,17 @@
-/* Modern CSS Reset */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond&display=swap');
+
+:root {
+  --background-colour: #F6F5F4;
+  --text-colour: #595E4E;
+  --banner-colour-1: #C8D7C4;
+  --banner-colour-2: (rgba(var(--color-1, 0.5))); /*needs 50% opacity*/
+  --button-colour: #E3EAE1;
+
+  --primary-font-web-copy: "EB Garamond"; /*need to import*/
+  --primary-font-body-copy: "Outfit"; /*need to import*/
+}
+
 *,
 *::before,
 *::after {
@@ -39,6 +52,54 @@ h5,
 h6 {
   overflow-wrap: break-word;
 }
+
+h1 {
+  font-family: var(--primary-font-web-copy);
+  font-size: 64px;
+}
+
+h2 {
+  font-family: var(--primary-font-web-copy);
+  font-size: 20px;
+  font-weight: bold;
+}
+
+h3 {
+  font-family: var(--primary-font-web-copy);
+  font-size: 16px;
+  text-decoration: underline;
+}
+
+h4 {
+  font-family: var(--primary-font-body-copy);
+  font-size: 24px;
+}
+
+h5 {
+  font-family: var(--primary-font-body-copy);
+  font-size: 16px;
+}
+
+h6 {
+  font-family: var(--primary-font-body-copy);
+  font-size: 20px;
+}
+
+a {
+  text-decoration: underline;
+}
+
+p {
+  font-family: var(--primary-font-body-copy);
+  font-size: 15px;
+}
+
+title {
+  font-family: var(--primary-font-web-copy);
+  letter-spacing: 10%;
+  font-size: 128px;
+}
+
 
 #root {
   isolation: isolate;
