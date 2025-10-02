@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import './App.css';
 import { useAuth } from './contexts/AuthContext';
 import { LoginForm } from './components/auth/LoginForm';
+import { Routes } from 'react-router-dom';
 // import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 
 // Simple inline types for now
