@@ -33,7 +33,7 @@ const ProductCard = () => {
 }
 =======
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import type { Product } from '../types';
 import { useCart } from '../contexts/CartContext';
 import './ProductCard.css';
@@ -53,6 +53,7 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+  const navigate = useNavigate();
   const { addItem } = useCart();
 
   /**
@@ -167,7 +168,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <button
           className={`view-details-btn ${!product.inStock ? 'disabled' : ''}`}
           disabled={!product.inStock}
-          onClick={() => (window.location.href = `/products/${product.id}`)}
+          onClick={() => navigate(`/products/${product.id}`)}
           aria-label={`${
             product.inStock ? 'View details for' : 'Out of stock:'
           } ${product.name}`}
@@ -207,6 +208,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </button>
         )}
       </div>
+
     </article>
   );
 };

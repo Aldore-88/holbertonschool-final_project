@@ -7,12 +7,22 @@ export interface CartItem {
   quantity: number;
   selectedDate?: Date;
   message?: string;
+  isSubscription?: boolean;
+  subscriptionFrequency?: 'weekly' | 'fortnightly' | 'monthly';
+  subscriptionDiscount?: number; // Percentage discount for subscription
 }
 
 interface CartState {
   items: CartItem[];
   isOpen: boolean;
   total: number;
+  purchaseType: 'one-time' | 'recurring' | 'spontaneous';
+  frequency: 'weekly' | 'fortnightly' | 'monthly';
+  giftMessage?: {
+    to: string;
+    from: string;
+    message: string;
+  };
 }
 
 type CartAction =
@@ -21,7 +31,10 @@ type CartAction =
   | { type: 'UPDATE_QUANTITY'; payload: { id: string; quantity: number } }
   | { type: 'CLEAR_CART' }
   | { type: 'TOGGLE_CART' }
-  | { type: 'LOAD_CART'; payload: CartItem[] };
+  | { type: 'LOAD_CART'; payload: CartItem[] }
+  | { type: 'SET_PURCHASE_TYPE'; payload: 'one-time' | 'recurring' | 'spontaneous' }
+  | { type: 'SET_FREQUENCY'; payload: 'weekly' | 'fortnightly' | 'monthly' }
+  | { type: 'SET_GIFT_MESSAGE'; payload: { to: string; from: string; message: string } };
 
 interface CartContextType {
   state: CartState;
@@ -31,6 +44,9 @@ interface CartContextType {
   clearCart: () => void;
   toggleCart: () => void;
   getItemCount: () => number;
+  setPurchaseType: (type: 'one-time' | 'recurring' | 'spontaneous') => void;
+  setFrequency: (frequency: 'weekly' | 'fortnightly' | 'monthly') => void;
+  setGiftMessage: (message: { to: string; from: string; message: string }) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -70,6 +86,12 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
       const total = calculateTotal(action.payload);
       return { ...state, items: action.payload, total };
     }
+    case 'SET_PURCHASE_TYPE':
+      return { ...state, purchaseType: action.payload };
+    case 'SET_FREQUENCY':
+      return { ...state, frequency: action.payload };
+    case 'SET_GIFT_MESSAGE':
+      return { ...state, giftMessage: action.payload };
     default:
       return state;
   }
@@ -77,7 +99,16 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
 
 const calculateTotal = (items: CartItem[]): number => {
   return items.reduce(
-    (total, item) => total + item.product.priceCents * item.quantity,
+    (total, item) => {
+      let itemPrice = item.product.priceCents * item.quantity;
+
+      // Apply subscription discount if this is a subscription item
+      if (item.isSubscription && item.subscriptionDiscount) {
+        itemPrice = itemPrice * (1 - item.subscriptionDiscount / 100);
+      }
+
+      return total + itemPrice;
+    },
     0
   );
 };
@@ -100,6 +131,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
     items: [],
     isOpen: false,
     total: 0,
+    purchaseType: 'one-time',
+    frequency: 'weekly',
   });
 
   // Load cart from localStorage on mount
@@ -160,6 +193,18 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
     return state.items.reduce((count, item) => count + item.quantity, 0);
   };
 
+  const setPurchaseType = (type: 'one-time' | 'recurring' | 'spontaneous') => {
+    dispatch({ type: 'SET_PURCHASE_TYPE', payload: type });
+  };
+
+  const setFrequency = (frequency: 'weekly' | 'fortnightly' | 'monthly') => {
+    dispatch({ type: 'SET_FREQUENCY', payload: frequency });
+  };
+
+  const setGiftMessage = (message: { to: string; from: string; message: string }) => {
+    dispatch({ type: 'SET_GIFT_MESSAGE', payload: message });
+  };
+
   const value = {
     state,
     addItem,
@@ -168,6 +213,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
     clearCart,
     toggleCart,
     getItemCount,
+    setPurchaseType,
+    setFrequency,
+    setGiftMessage,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
