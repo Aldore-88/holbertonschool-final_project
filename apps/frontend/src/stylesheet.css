@@ -1,12 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=EB+Garamond&display=swap');
 
+@import "tailwindcss";
+
 :root {
     --background-colour: #F6F5F4;
     --text-colour: #595E4E;
     --banner-colour-1: #C8D7C4;
     --banner-colour-2: #C8D7C480; /*banner colour with 50% opacity*/
     --button-colour: #E3EAE1;
+    --radius-tile: 10px;
+    --radius-image: 50px;
+    --radius-button: 50px;
 
     --primary-font-web-copy: "EB Garamond",Georgia, serif;
     --primary-font-body-copy: "Outfit", Arial, sans-serif;
@@ -181,6 +186,7 @@ p {
     width: auto;
     /* height: 240px; */
     /* background-color:blue; */
+    margin-bottom:5rem;
 }
 
 .banner-menu{
@@ -202,3 +208,57 @@ p {
     background-color: var(--banner-colour-1);
 }
 
+.product-card-container {
+    width: 400px;
+    height: 740px;
+    padding: 40px;
+    align-content:center;
+    margin: 20px;
+    border:dashed;
+}
+
+.product-image {
+    height: auto;
+    width: auto;
+    border: dotted;
+}
+
+.product-image img{
+    width:100%;
+    height:100%;
+    object-fit: cover;
+    border-radius: var(--radius-image);
+}
+
+.product-card-container section{
+    padding-left: 25px;
+    padding-right: 25px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    max-height: 120px;
+    overflow: hidden;
+}
+
+.product-header{
+    height: 25px;
+}
+
+.left{
+    float: left;
+}
+
+.right{
+    float: right;
+}
+
+.product-card-container button{
+    width: 40%;
+    background-color: var(--button-colour);
+    border:none;
+    color: var(--primary-font-body-copy);
+    font-family: var(--primary-font-web-copy);
+    cursor: pointer;
+
+    height: 50px;
+    border-radius: var(--radius-button);
+}

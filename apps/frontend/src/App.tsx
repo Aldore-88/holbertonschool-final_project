@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import './App.css';
 import { useAuth } from './contexts/AuthContext';
 import { LoginForm } from './components/auth/LoginForm';
+// import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 
 // Simple inline types for now
 interface Product {
@@ -232,6 +233,20 @@ function App() {
             <h1>🌸 Flora</h1>
             <p>Flowers & Plants Marketplace</p>
           </div>
+
+          {/* <BrowserRouter>
+            <nav>
+              <Link to="/">Home</Link> |{" "}
+              <Link to="/pages/Checkout.tsx">About</Link> |{" "}
+              <Link to="/pages/HomePage.tsx">Contact</Link>
+            </nav>
+
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+            </Routes>
+          </BrowserRouter> */}
           
           <div className="auth-section">
             {authLoading ? (
