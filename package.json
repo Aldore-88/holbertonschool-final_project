@@ -42,7 +42,12 @@
   "author": "Anthony, Bevan, Xiaoling, and Lily",
   "license": "MIT",
   "dependencies": {
+<<<<<<< HEAD
     "react-router-dom": "^6.30.1",
+=======
+    "@auth0/auth0-react": "^2.0.0",
+    "jwks-rsa": "^3.0.1",
+>>>>>>> ceb94a311086e5af89eeb9de8bc85c30707a3fba
     "zod": "3.22.4"
   }
 }

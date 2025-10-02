@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import { Product } from '../types';
+import type { Product } from '../types';
 
 export interface CartItem {
   id: string;
@@ -77,7 +77,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
 
 const calculateTotal = (items: CartItem[]): number => {
   return items.reduce(
-    (total, item) => total + item.product.price * item.quantity,
+    (total, item) => total + item.product.priceCents * item.quantity,
     0
   );
 };
@@ -93,6 +93,9 @@ export const useCart = () => {
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  const [isInitialized, setIsInitialized] = React.useState(false);
+
+  // Initialize state with localStorage data if available
   const [state, dispatch] = useReducer(cartReducer, {
     items: [],
     isOpen: false,
@@ -102,20 +105,32 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   // Load cart from localStorage on mount
   useEffect(() => {
     const savedCart = localStorage.getItem('flora-cart');
+    console.log('🛒 Loading cart from localStorage. Raw data:', savedCart);
     if (savedCart) {
       try {
         const parsedCart = JSON.parse(savedCart);
-        dispatch({ type: 'LOAD_CART', payload: parsedCart });
+        console.log('🛒 Parsed cart. Item count:', parsedCart.length);
+        console.log('🛒 Parsed cart items:', JSON.stringify(parsedCart, null, 2));
+        if (parsedCart.length > 0) {
+          dispatch({ type: 'LOAD_CART', payload: parsedCart });
+        }
       } catch (error) {
         console.error('Error loading cart from localStorage:', error);
       }
+    } else {
+      console.log('🛒 No saved cart found in localStorage');
     }
+    setIsInitialized(true);
   }, []);
 
-  // Save cart to localStorage whenever it changes
+  // Save cart to localStorage whenever it changes (but only after initialization)
   useEffect(() => {
+    if (!isInitialized) return;
+
+    console.log('🛒 Saving cart to localStorage. Item count:', state.items.length);
+    console.log('🛒 Cart items:', JSON.stringify(state.items, null, 2));
     localStorage.setItem('flora-cart', JSON.stringify(state.items));
-  }, [state.items]);
+  }, [state.items, isInitialized]);
 
   const addItem = (item: Omit<CartItem, 'id'>) => {
     dispatch({ type: 'ADD_ITEM', payload: item });

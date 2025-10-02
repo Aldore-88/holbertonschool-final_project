@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import './App.css';
 import { useAuth } from './contexts/AuthContext';
+<<<<<<< HEAD
 import { LoginForm } from './components/auth/LoginForm';
 import { Routes } from 'react-router-dom';
 // import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
@@ -144,66 +146,67 @@ const dummyProducts: Product[] = [
     updatedAt: '2024-01-01T00:00:00Z',
   },
 ];
+=======
+import { useAuth0 } from '@auth0/auth0-react';
+import { useCart } from './contexts/CartContext';
+import ProductsPage from './pages/ProductsPage';
+import SubscriptionsPage from './pages/SubscriptionsPage';
+import CartPage from './pages/CartPage';
+import CheckoutPage from './pages/Checkout';
+import OrderConfirmationPage from './pages/OrderConfirmationPage';
+>>>>>>> ceb94a311086e5af89eeb9de8bc85c30707a3fba
 
 function App() {
-  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [useAPI, setUseAPI] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  
-  const { user, signOut, loading: authLoading } = useAuth();
+  const {
+    user,
+    login,
+    logout,
+    loading: authLoading,
+    getAccessToken,
+  } = useAuth();
+  const { getItemCount } = useCart();
 
   useEffect(() => {
-    // Try to fetch from API first
-    fetchProducts();
+    // Check if API is available
+    checkAPIStatus();
   }, []);
 
-  const fetchProducts = async () => {
+  useEffect(() => {
+    if (user) {
+      getAccessToken().then((token) => {
+        if (token) {
+          console.log('Auth0 token: ', token);
+        } else {
+          console.log('No Auth0 token found');
+        }
+      });
+    }
+  }, [user, getAccessToken]);
+
+  const checkAPIStatus = async () => {
     try {
       setLoading(true);
       const apiUrl =
         import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
-      console.log('🔍 Trying API:', `${apiUrl}/products`);
+      console.log('🔍 Checking API status:', `${apiUrl}/health`);
 
-      const response = await fetch(`${apiUrl}/products`);
+      const response = await fetch(`${apiUrl}/health`);
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data: ProductResponse = await response.json();
-      console.log('✅ API Data received:', data);
-
-      if (data.products && data.products.length > 0) {
-        setProducts(data.products);
+      if (response.ok) {
+        console.log('✅ API is available');
         setUseAPI(true);
-        setError(null);
       } else {
-        // No products in API, fall back to dummy data
-        console.log('ℹ️ No products in API, using dummy data');
-        setProducts(dummyProducts);
+        console.log('ℹ️ API not responding properly');
         setUseAPI(false);
-        setError(null);
       }
     } catch (err) {
-      console.log('ℹ️ API not available, using dummy data:', err);
-      setProducts(dummyProducts);
+      console.log('ℹ️ API not available:', err);
       setUseAPI(false);
-      setError(null);
     } finally {
       setLoading(false);
     }
-  };
-
-  const formatPrice = (priceCents: number) =>
-    `$${(priceCents / 100).toFixed(2)}`;
-
-  const formatEnumValue = (value: string) => {
-    return value
-      .replace(/_/g, ' ')
-      .toLowerCase()
-      .replace(/\b\w/g, (l) => l.toUpperCase());
   };
 
   if (loading) {
@@ -214,19 +217,44 @@ function App() {
     );
   }
 
-  if (error) {
-    return (
-      <div className="app">
-        <div className="error">
-          <h2>❌ Error</h2>
-          <p>{error}</p>
-          <button onClick={fetchProducts}>Try Again</button>
-        </div>
-      </div>
-    );
-  }
+  return (
+    <BrowserRouter>
+      <AppContent
+        loading={loading}
+        useAPI={useAPI}
+        user={user}
+        authLoading={authLoading}
+        login={login}
+        logout={logout}
+        getItemCount={getItemCount}
+      />
+    </BrowserRouter>
+  );
+}
+
+function AppContent({ loading, useAPI, user, authLoading, login, logout, getItemCount }: any) {
+  const navigate = useNavigate();
+  const { isLoading: auth0Loading, isAuthenticated } = useAuth0();
+
+  useEffect(() => {
+    // Handle Auth0 redirect callback - wait until Auth0 finishes processing
+    if (!auth0Loading && isAuthenticated) {
+      const returnTo = sessionStorage.getItem('auth_return_to');
+
+      if (returnTo) {
+        console.log('📍 Navigating to saved location:', returnTo);
+        sessionStorage.removeItem('auth_return_to');
+
+        // Small delay to ensure Auth0 has fully processed
+        setTimeout(() => {
+          navigate(returnTo, { replace: true });
+        }, 100);
+      }
+    }
+  }, [auth0Loading, isAuthenticated, navigate]);
 
   return (
+<<<<<<< HEAD
     <div className="app">
       <header className="header">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -272,140 +300,163 @@ function App() {
             ) : (
               <button 
                 onClick={() => setShowLoginModal(true)}
+=======
+      <div className="app">
+        <header className="header">
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <div>
+              <Link
+                to="/"
+                style={{ textDecoration: 'none', color: 'inherit' }}
+              >
+                <h1>🌸 Flora</h1>
+                <p>Flowers & Plants Marketplace</p>
+              </Link>
+            </div>
+
+            <nav style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+              <Link
+                to="/products"
+>>>>>>> ceb94a311086e5af89eeb9de8bc85c30707a3fba
                 style={{
                   padding: '0.5rem 1rem',
                   backgroundColor: '#10b981',
                   color: 'white',
-                  border: 'none',
+                  textDecoration: 'none',
                   borderRadius: '4px',
-                  cursor: 'pointer'
                 }}
               >
-                Sign In
-              </button>
-            )}
-          </div>
-        </div>
-        
-        {!useAPI && (
-          <div className="demo-badge">🚧 Demo Mode - Using Sample Data</div>
-        )}
-      </header>
+                Browse Products
+              </Link>
 
-      <main className="main">
-        <section className="hero">
-          <h2>Welcome to Flora</h2>
-          <p>Discover beautiful flowers and plants for every occasion</p>
-        </section>
+              <Link
+                to="/cart"
+                style={{
+                  padding: '0.5rem 1rem',
+                  backgroundColor: '#7a2e4a',
+                  color: 'white',
+                  textDecoration: 'none',
+                  borderRadius: '4px',
+                  position: 'relative',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                }}
+              >
+                🛒 Cart
+                {getItemCount() > 0 && (
+                  <span style={{
+                    backgroundColor: '#dc2626',
+                    color: 'white',
+                    borderRadius: '50%',
+                    width: '20px',
+                    height: '20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '0.75rem',
+                    fontWeight: 'bold',
+                  }}>
+                    {getItemCount()}
+                  </span>
+                )}
+              </Link>
 
-        <section className="products">
-          <h3>Our Products ({products.length})</h3>
-
-          {products.length === 0 ? (
-            <div className="no-products">
-              <p>No products found. Make sure to seed the database!</p>
-              <p>
-                Run: <code>pnpm db:seed</code>
-              </p>
-            </div>
-          ) : (
-            <div className="product-grid">
-              {products.map((product) => (
-                <div
-                  key={product.id}
-                  className="product-card"
-                >
-                  {product.imageUrl && (
-                    <img
-                      src={product.imageUrl}
-                      alt={product.name}
-                      className="product-image"
-                    />
-                  )}
-                  <div className="product-info">
-                    <h4>{product.name}</h4>
-                    <p className="description">{product.description}</p>
-                    <div className="price">
-                      {formatPrice(product.priceCents)}
-                    </div>
-                    <div className="product-meta">
-                      <span className="type">
-                        {formatEnumValue(product.type)}
-                      </span>
-                      {!product.inStock && (
-                        <span className="out-of-stock">Out of Stock</span>
-                      )}
-                    </div>
-                    <div className="tags">
-                      {product.occasions.slice(0, 2).map((occasion) => (
-                        <span
-                          key={occasion}
-                          className="tag occasion"
-                        >
-                          {formatEnumValue(occasion)}
-                        </span>
-                      ))}
-                      {product.colors.slice(0, 2).map((color) => (
-                        <span
-                          key={color}
-                          className="tag color"
-                        >
-                          {formatEnumValue(color)}
-                        </span>
-                      ))}
-                    </div>
+              <div className="auth-section">
+                {/* Show loading spinner while Auth0 is loading */}
+                {authLoading ? (
+                  <div>Loading...</div>
+                ) : user ? (
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '1rem',
+                    }}
+                  >
+                    {/* Show user's email from Auth0 profile */}
+                    <span>Welcome, {user.email}</span>
+                    <button
+                      onClick={logout}
+                      style={{
+                        padding: '0.5rem 1rem',
+                        backgroundColor: '#dc2626',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Sign Out
+                    </button>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
-      </main>
-
-      {/* Login Modal */}
-      {showLoginModal && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000
-        }}>
-          <div style={{ position: 'relative' }}>
-            <button
-              onClick={() => setShowLoginModal(false)}
-              style={{
-                position: 'absolute',
-                top: '1rem',
-                right: '1rem',
-                background: 'none',
-                border: 'none',
-                fontSize: '1.5rem',
-                cursor: 'pointer',
-                zIndex: 1001
-              }}
-            >
-              ×
-            </button>
-            <LoginForm 
-              onSuccess={() => setShowLoginModal(false)}
-            />
+                ) : (
+                  <button
+                    onClick={login}
+                    style={{
+                      padding: '0.5rem 1rem',
+                      backgroundColor: '#10b981',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Sign In
+                  </button>
+                )}
+              </div>
+            </nav>
           </div>
-        </div>
-      )}
 
-      <footer className="footer">
-        <p>
-          &copy; 2024 Flora - Holberton Demo Project by Anthony, Bevan,
-          Xiaoling, and Lily
-        </p>
-      </footer>
-    </div>
+          {!useAPI && (
+            <div className="demo-badge">🚧 Demo Mode - API Not Available</div>
+          )}
+        </header>
+
+        <main className="main">
+          {/* Define app routes. AuthCallback is not needed with Auth0 React SDK */}
+          <Routes>
+            <Route
+              path="/"
+              element={<ProductsPage />}
+            />
+            <Route
+              path="/products"
+              element={<ProductsPage />}
+            />
+            <Route
+              path="/subscriptions"
+              element={<SubscriptionsPage />}
+            />
+            <Route
+              path="/cart"
+              element={<CartPage />}
+            />
+            <Route
+              path="/checkout"
+              element={<CheckoutPage />}
+            />
+            <Route
+              path="/order-confirmation/:orderId"
+              element={<OrderConfirmationPage />}
+            />
+          </Routes>
+        </main>
+
+        <footer className="footer">
+          <p>
+            &copy; 2025 Flora - Holberton Demo Project by Anthony, Bevan,
+            Xiaoling, and Lily
+          </p>
+        </footer>
+      </div>
   );
 }
 
