@@ -79,7 +79,14 @@ ALTER TABLE "orders" ADD COLUMN IF NOT EXISTS "billingCountry" TEXT DEFAULT 'AU'
 ALTER TABLE "orders" ADD COLUMN IF NOT EXISTS "billingPhone" TEXT;
 
 -- Rename and add delivery date fields
-ALTER TABLE "orders" RENAME COLUMN "deliveryDate" TO "requestedDeliveryDate";
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.columns
+               WHERE table_name = 'orders' AND column_name = 'deliveryDate') THEN
+        ALTER TABLE "orders" RENAME COLUMN "deliveryDate" TO "requestedDeliveryDate";
+    END IF;
+END $$;
+
 ALTER TABLE "orders" ADD COLUMN IF NOT EXISTS "actualDeliveryDate" TIMESTAMP(3);
 
 -- AlterTable: order_items
@@ -320,45 +327,100 @@ CREATE UNIQUE INDEX IF NOT EXISTS "delivery_tracking_trackingNumber_key" ON "del
 -- ============================================
 
 -- AddForeignKey: products -> categories
-ALTER TABLE "products" ADD CONSTRAINT IF NOT EXISTS "products_categoryId_fkey"
-    FOREIGN KEY ("categoryId") REFERENCES "categories"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'products_categoryId_fkey') THEN
+        ALTER TABLE "products" ADD CONSTRAINT "products_categoryId_fkey"
+            FOREIGN KEY ("categoryId") REFERENCES "categories"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+    END IF;
+END $$;
 
 -- AddForeignKey: orders -> subscriptions
-ALTER TABLE "orders" ADD CONSTRAINT IF NOT EXISTS "orders_subscriptionId_fkey"
-    FOREIGN KEY ("subscriptionId") REFERENCES "subscriptions"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'orders_subscriptionId_fkey') THEN
+        ALTER TABLE "orders" ADD CONSTRAINT "orders_subscriptionId_fkey"
+            FOREIGN KEY ("subscriptionId") REFERENCES "subscriptions"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+    END IF;
+END $$;
 
 -- AddForeignKey: subscriptions -> users
-ALTER TABLE "subscriptions" ADD CONSTRAINT IF NOT EXISTS "subscriptions_userId_fkey"
-    FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'subscriptions_userId_fkey') THEN
+        ALTER TABLE "subscriptions" ADD CONSTRAINT "subscriptions_userId_fkey"
+            FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+    END IF;
+END $$;
 
 -- AddForeignKey: subscription_items -> subscriptions
-ALTER TABLE "subscription_items" ADD CONSTRAINT IF NOT EXISTS "subscription_items_subscriptionId_fkey"
-    FOREIGN KEY ("subscriptionId") REFERENCES "subscriptions"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'subscription_items_subscriptionId_fkey') THEN
+        ALTER TABLE "subscription_items" ADD CONSTRAINT "subscription_items_subscriptionId_fkey"
+            FOREIGN KEY ("subscriptionId") REFERENCES "subscriptions"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+    END IF;
+END $$;
 
 -- AddForeignKey: subscription_items -> products
-ALTER TABLE "subscription_items" ADD CONSTRAINT IF NOT EXISTS "subscription_items_productId_fkey"
-    FOREIGN KEY ("productId") REFERENCES "products"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'subscription_items_productId_fkey') THEN
+        ALTER TABLE "subscription_items" ADD CONSTRAINT "subscription_items_productId_fkey"
+            FOREIGN KEY ("productId") REFERENCES "products"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+    END IF;
+END $$;
 
 -- AddForeignKey: payments -> orders
-ALTER TABLE "payments" ADD CONSTRAINT IF NOT EXISTS "payments_orderId_fkey"
-    FOREIGN KEY ("orderId") REFERENCES "orders"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'payments_orderId_fkey') THEN
+        ALTER TABLE "payments" ADD CONSTRAINT "payments_orderId_fkey"
+            FOREIGN KEY ("orderId") REFERENCES "orders"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+    END IF;
+END $$;
 
 -- AddForeignKey: delivery_windows -> delivery_zones
-ALTER TABLE "delivery_windows" ADD CONSTRAINT IF NOT EXISTS "delivery_windows_zoneId_fkey"
-    FOREIGN KEY ("zoneId") REFERENCES "delivery_zones"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'delivery_windows_zoneId_fkey') THEN
+        ALTER TABLE "delivery_windows" ADD CONSTRAINT "delivery_windows_zoneId_fkey"
+            FOREIGN KEY ("zoneId") REFERENCES "delivery_zones"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+    END IF;
+END $$;
 
 -- AddForeignKey: tracking_events -> delivery_tracking
-ALTER TABLE "tracking_events" ADD CONSTRAINT IF NOT EXISTS "tracking_events_trackingId_fkey"
-    FOREIGN KEY ("trackingId") REFERENCES "delivery_tracking"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'tracking_events_trackingId_fkey') THEN
+        ALTER TABLE "tracking_events" ADD CONSTRAINT "tracking_events_trackingId_fkey"
+            FOREIGN KEY ("trackingId") REFERENCES "delivery_tracking"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+    END IF;
+END $$;
 
 -- AddForeignKey: carts -> users
-ALTER TABLE "carts" ADD CONSTRAINT IF NOT EXISTS "carts_userId_fkey"
-    FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'carts_userId_fkey') THEN
+        ALTER TABLE "carts" ADD CONSTRAINT "carts_userId_fkey"
+            FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+    END IF;
+END $$;
 
 -- AddForeignKey: cart_items -> carts
-ALTER TABLE "cart_items" ADD CONSTRAINT IF NOT EXISTS "cart_items_cartId_fkey"
-    FOREIGN KEY ("cartId") REFERENCES "carts"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'cart_items_cartId_fkey') THEN
+        ALTER TABLE "cart_items" ADD CONSTRAINT "cart_items_cartId_fkey"
+            FOREIGN KEY ("cartId") REFERENCES "carts"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+    END IF;
+END $$;
 
 -- AddForeignKey: cart_items -> products
-ALTER TABLE "cart_items" ADD CONSTRAINT IF NOT EXISTS "cart_items_productId_fkey"
-    FOREIGN KEY ("productId") REFERENCES "products"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'cart_items_productId_fkey') THEN
+        ALTER TABLE "cart_items" ADD CONSTRAINT "cart_items_productId_fkey"
+            FOREIGN KEY ("productId") REFERENCES "products"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+    END IF;
+END $$;
