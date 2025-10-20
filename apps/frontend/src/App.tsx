@@ -14,7 +14,6 @@ import OrderHistory from "./pages/OrderHistory";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/Checkout";
 import OrderConfirmationPage from "./pages/OrderConfirmationPage";
-import { Button } from "react-day-picker";
 
 
 function App() {
