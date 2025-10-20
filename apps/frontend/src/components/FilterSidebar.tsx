@@ -36,20 +36,12 @@ interface FilterSidebarProps {
 
   // Function to call when user changes a filter
   onFilterChange: (filterType: keyof ProductFilters, value: string) => void;
-
-  // Function to clear all filters
-  onClearFilters: () => void;
-
-  // Number of currently active filters (for display)
-  activeFilterCount: number;
 }
 
 const FilterSidebar: React.FC<FilterSidebarProps> = ({
   filterOptions,
   selectedFilters,
   onFilterChange,
-  onClearFilters,
-  activeFilterCount,
 }) => {
   /**
    * Handle filter change and ensure we pass empty string for "All" option

@@ -216,8 +216,6 @@ const ProductsPage: React.FC = () => {
                 filterOptions={filterOptions}
                 selectedFilters={selectedFilters}
                 onFilterChange={handleFilterChange}
-                onClearFilters={handleClearFilters}
-                activeFilterCount={getActiveFilterCount()}
               />
             </aside>
 

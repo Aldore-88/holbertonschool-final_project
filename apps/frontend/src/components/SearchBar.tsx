@@ -301,7 +301,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 // Extend Window interface for TypeScript
 declare global {
   interface Window {
-    searchTimeout?: NodeJS.Timeout;
+    searchTimeout?: number;
   }
 }
 

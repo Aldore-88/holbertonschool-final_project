@@ -32,16 +32,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   };
 
   /**
-   * Format array of attributes for display
-   * Takes an array like ['ROMANTIC', 'ELEGANT'] and makes it readable
-   */
-  const formatAttributes = (attributes: string[]): string => {
-    return attributes
-      .map((attr) => attr.charAt(0).toUpperCase() + attr.slice(1).toLowerCase())
-      .join(', ');
-  };
-
-  /**
    * Get stock status styling
    */
   const getStockStatus = () => {

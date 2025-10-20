@@ -17,7 +17,6 @@ const CartPage: React.FC = () => {
 
   // Use cart state instead of local state
   const giftMessage = cartState.giftMessage || { to: '', from: '', message: '' };
-  const [showSaveConfirmation, setShowSaveConfirmation] = React.useState(false);
   const [isGenerating, setIsGenerating] = React.useState(false);
   const [generateError, setGenerateError] = React.useState<string | null>(null);
   const [selectedTone, setSelectedTone] = React.useState('warm');
@@ -29,12 +28,6 @@ const CartPage: React.FC = () => {
   const handleCheckout = () => {
     // Save message to cart items if needed
     window.location.href = '/checkout';
-  };
-
-  const handleSaveMessage = () => {
-    // Message is already saved via setGiftMessage in onChange
-    setShowSaveConfirmation(true);
-    setTimeout(() => setShowSaveConfirmation(false), 2000);
   };
 
   const handleGenerateAIMessage = async () => {
@@ -186,7 +179,7 @@ const CartPage: React.FC = () => {
                   {item.selectedDate && (
                     <div className="delivery-date-info">
                       {item.purchaseType === 'spontaneous'
-                        ? `First delivery: ${format(item.selectedDate, 'PPP')} (then on-demand)`
+                        ? `First delivery: ${format(item.selectedDate, 'PPP')} (then random surprise deliveries ${item.subscriptionFrequency})`
                         : item.isSubscription
                         ? `First delivery: ${format(item.selectedDate, 'PPP')} (then auto-renews ${item.subscriptionFrequency})`
                         : `Delivery: ${format(item.selectedDate, 'PPP')}`
