@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import type { Product, FilterOptions, ProductResponse } from '../types';
+import type { Product, ProductResponse } from '../types';
 import { apiService } from '../services/api';
 import ProductGrid from '../components/ProductGrid';
 import './ProductsPage.css';
@@ -13,27 +13,14 @@ const LandingPage: React.FC = () => {
   // State for storing the current products being displayed
   const [products, setProducts] = useState<Product[]>([]);
 
-  // State for storing available filter options (filled from backend)
-  const [filterOptions, setFilterOptions] = useState<FilterOptions>({
-    occasions: [],
-    seasons: [],
-    moods: [],
-    colors: [],
-    types: [],
-    priceRanges: [],
-  });
-
   // State for storing user's currently selected filters
-  const [selectedFilters, setSelectedFilters] = useState<ProductFilters>({
+  const [selectedFilters, setSelectedFilters] = useState<any>({
     page: 1,
     limit: 3,
   });
 
   // State for loading indicator
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  // State for error handling
-  const [error, setError] = useState<string | null>(null);
 
   /**
    * Effect hook to read URL query parameters and apply filters on mount
@@ -44,7 +31,7 @@ const LandingPage: React.FC = () => {
     const urlSearch = searchParams.get('search');
 
     // Map category names to appropriate filters
-    const categoryMapping: Record<string, Partial<ProductFilters>> = {
+    const categoryMapping: Record<string, any> = {
       romantic: { mood: 'ROMANTIC' },
       cheerful: { mood: 'CHEERFUL' },
       elegant: { mood: 'ELEGANT' },
@@ -72,7 +59,6 @@ const LandingPage: React.FC = () => {
   const fetchProducts = useCallback(async () => {
     try {
       setIsLoading(true);
-      setError(null);
 
       // Convert our filters object to query parameters for the API
       const queryParams: Record<string, string> = {};
@@ -91,10 +77,8 @@ const LandingPage: React.FC = () => {
 
       // Update our component state with the response data
       setProducts(response.products);
-      setFilterOptions(response.filters);
     } catch (err) {
       console.error('Error fetching products:', err);
-      setError('Failed to load products. Please try again.');
     } finally {
       setIsLoading(false);
     }

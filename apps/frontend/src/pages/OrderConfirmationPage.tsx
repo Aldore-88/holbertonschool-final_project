@@ -118,9 +118,28 @@ const OrderConfirmationPage: React.FC = () => {
     if (!order || !order.items) return [];
 
     // Convert order items to cart item format for grouping
+    // Note: We only need minimal product info for grouping by date
     const cartItems = order.items.map(item => ({
       id: item.id,
-      product: item.product,
+      product: {
+        ...item.product,
+        // Add missing required Product fields with placeholder values
+        description: '',
+        priceRange: '',
+        inStock: true,
+        stockCount: 0,
+        occasions: [],
+        seasons: [],
+        moods: [],
+        colors: [],
+        types: [],
+        isActive: true,
+        type: '',
+        categoryId: null,
+        longDescription: undefined,
+        createdAt: '',
+        updatedAt: '',
+      },
       quantity: item.quantity,
       selectedDate: item.requestedDeliveryDate ? new Date(item.requestedDeliveryDate) : undefined,
     }));
