@@ -1,284 +1,321 @@
-# 🧪 Flora Subscription Testing Guide
+# 🧪 Flora Testing Guide
 
-## Quick Testing Commands
+Complete guide for running tests, understanding the test suite, and working with CI/CD.
 
-### 🏃‍♀️ Automated Tests
+---
 
-```bash
-# Run comprehensive subscription test suite
-docker exec flora-backend pnpm test:subscriptions
-
-# Alternative: Run in Docker background first
-pnpm docker:dev:bg
-docker exec flora-backend pnpm test:subscriptions
-```
-
-**Expected Output:**
-```
-🌸 Flora Subscription System - Simplified Test Suite (Melbourne)
-═════════════════════════════════════════════════════════════════
-
-✅ Simplified Flow:       ✅ PASSED
-✅ Management Operations: ✅ PASSED
-✅ Spontaneous Delivery:  ✅ PASSED
-✅ Order Integration:     ✅ PASSED
-✅ Melbourne Delivery:    ✅ PASSED
-✅ Error Handling:        ✅ PASSED
-
-🎯 Overall: 6/6 tests passed
-```
-
-## 📱 Manual API Testing (Postman/curl)
-
-### 🔐 Authentication Setup
-
-1. **Get JWT Token:**
-   - Login at: http://localhost:5173
-   - Open Dev Tools → Console
-   - Find `access_token` value
-   - Copy for API testing
-
-### 🚚 Delivery Endpoints (No Auth Required)
+## 🎯 Quick Start
 
 ```bash
-# Get Melbourne delivery info
-curl http://localhost:3001/api/delivery/info
+# Run all tests
+docker exec flora-backend pnpm test
 
-# Validate Melbourne postcode
-curl http://localhost:3001/api/delivery/validate/3000
-curl http://localhost:3001/api/delivery/validate/3141
-curl http://localhost:3001/api/delivery/validate/9999  # Should fail
+# Run specific test suites
+docker exec flora-backend pnpm test:auth        # Authentication tests
+docker exec flora-backend pnpm test:order       # Order processing tests
+docker exec flora-backend pnpm test:payment     # Payment & Stripe tests
+docker exec flora-backend pnpm test:email       # Email service tests
+docker exec flora-backend pnpm test:ai          # AI integration tests
+docker exec flora-backend pnpm test:integration # Full integration tests
+
+# Run tests in watch mode (auto-rerun on file changes)
+docker exec flora-backend pnpm test:watch
+
+# Generate coverage report
+docker exec flora-backend pnpm test:coverage
 ```
 
-**Expected Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "serviceArea": {
-      "name": "Melbourne Metro Area",
-      "description": "We deliver throughout Greater Melbourne"
-    },
-    "pricing": {
-      "standard": {"fee": 899, "display": "$8.99 AUD"},
-      "express": {"fee": 1599, "display": "$15.99 AUD"}
-    },
-    "currency": "AUD"
-  }
-}
-```
+---
 
-### 📋 Subscription Endpoints (Auth Required)
+## 📋 Test Suite Overview
 
-#### Create Weekly Subscription (Melbourne)
-```bash
-POST http://localhost:3001/api/subscriptions/from-product
-Headers:
-  Content-Type: application/json
-  Authorization: Bearer YOUR_JWT_TOKEN
+Our backend has **6 automated test files** covering all core functionality:
 
-Body:
-{
-  "productId": "PRODUCT_ID_FROM_DB",
-  "subscriptionType": "RECURRING_WEEKLY",
-  "quantity": 1,
-  "deliveryType": "STANDARD",
-  "deliveryNotes": "Leave at door",
-  "shippingAddress": {
-    "firstName": "Emma",
-    "lastName": "Melbourne",
-    "street1": "123 Collins Street",
-    "street2": "Unit 15B",
-    "city": "Melbourne",
-    "state": "VIC",
-    "zipCode": "3000",
-    "phone": "+61-3-9555-1234"
-  }
-}
-```
+| Test File | Purpose | What It Tests |
+|-----------|---------|---------------|
+| `auth.test.ts` | Authentication & JWT | Auth0 token validation, user authentication |
+| `order.test.ts` | Order Processing | Order creation, validation, status updates |
+| `payment.test.ts` | Payment Integration | Stripe payment intents, refunds, webhooks |
+| `email.test.ts` | Email Service | Order confirmations, email templates |
+| `ai.test.ts` | AI Integration | Gemini AI gift message generation |
+| `full-integration.test.ts` | End-to-End Flow | Complete user journey: order → payment → email |
 
-#### Get User Subscriptions
-```bash
-GET http://localhost:3001/api/subscriptions
-Headers: Authorization: Bearer YOUR_JWT_TOKEN
-```
+**Total:** 80 automated tests running in CI/CD
 
-#### Subscription Management
-```bash
-# Pause subscription
-POST http://localhost:3001/api/subscriptions/SUBSCRIPTION_ID/pause
+**Note:** Subscriptions are currently tested manually. Automated subscription tests are planned for future implementation.
 
-# Resume subscription
-POST http://localhost:3001/api/subscriptions/SUBSCRIPTION_ID/resume
+---
 
-# Cancel subscription
-DELETE http://localhost:3001/api/subscriptions/SUBSCRIPTION_ID
-```
+## 🛠️ Manual Testing Utilities
 
-#### Create Spontaneous Delivery
-```bash
-POST http://localhost:3001/api/subscriptions/SUBSCRIPTION_ID/spontaneous
-Headers:
-  Content-Type: application/json
-  Authorization: Bearer YOUR_JWT_TOKEN
-
-Body:
-{
-  "requestedDate": "2024-10-15T00:00:00.000Z",
-  "deliveryNotes": "Rush delivery for special event"
-}
-```
-
-## 🎯 Test Scenarios for Demo Day
-
-### Scenario 1: Melbourne Customer Weekly Flowers
-```json
-{
-  "productId": "cm26goh240000r2c5xbpv7xj5",
-  "subscriptionType": "RECURRING_WEEKLY",
-  "shippingAddress": {
-    "firstName": "Sarah",
-    "lastName": "Wilson",
-    "street1": "456 Chapel Street",
-    "city": "South Yarra",
-    "state": "VIC",
-    "zipCode": "3141",
-    "phone": "+61-3-9555-7890"
-  },
-  "deliveryType": "STANDARD",
-  "deliveryNotes": "Apartment 12B - ring buzzer"
-}
-```
-
-### Scenario 2: Express Delivery to Melbourne CBD
-```json
-{
-  "productId": "cm26goh240000r2c5xbpv7xj5",
-  "subscriptionType": "RECURRING_MONTHLY",
-  "shippingAddress": {
-    "firstName": "James",
-    "lastName": "Chen",
-    "street1": "88 Collins Street",
-    "city": "Melbourne",
-    "state": "VIC",
-    "zipCode": "3000",
-    "phone": "+61-3-9555-0123"
-  },
-  "deliveryType": "EXPRESS",
-  "deliveryNotes": "Office delivery - Level 15"
-}
-```
-
-### Scenario 3: Spontaneous Subscription
-```json
-{
-  "productId": "cm26goh240000r2c5xbpv7xj5",
-  "subscriptionType": "SPONTANEOUS",
-  "shippingAddress": {
-    "firstName": "Lucy",
-    "lastName": "Taylor",
-    "street1": "22 Brunswick Street",
-    "city": "Fitzroy",
-    "state": "VIC",
-    "zipCode": "3065",
-    "phone": "+61-3-9555-4567"
-  },
-  "deliveryType": "EXPRESS"
-}
-```
-
-## 🚨 Error Testing
-
-### Authentication Errors
-```bash
-# Missing token
-curl http://localhost:3001/api/subscriptions
-# Expected: {"success": false, "error": "Missing or invalid authorization header"}
-
-# Invalid token
-curl -H "Authorization: Bearer invalid_token" http://localhost:3001/api/subscriptions
-# Expected: {"success": false, "error": "Invalid token"}
-```
-
-### Validation Errors
-```bash
-# Missing required fields
-POST /api/subscriptions/from-product
-Body: {"productId": "invalid"}
-# Expected: 400 error with missing fields message
-
-# Invalid postcode
-curl http://localhost:3001/api/delivery/validate/1234
-# Expected: {"available": false}
-```
-
-## 🔧 Troubleshooting
-
-### Common Issues
-
-**1. "No products found in database"**
-```bash
-# Solution: Reseed database
-docker exec flora-backend pnpm db:seed
-```
-
-**2. "User user_1_test not found"**
-```bash
-# Solution: Check if database was seeded properly
-docker exec flora-backend pnpm db:seed
-```
-
-**3. "Services not running"**
-```bash
-# Solution: Start Docker services
-pnpm docker:dev:bg
-pnpm docker:logs  # Check logs
-```
-
-**4. Database connection errors**
-```bash
-# Solution: Restart services
-pnpm docker:restart-backend
-```
-
-### Verifying Test Data
+These are helper scripts for manual testing (NOT part of automated CI/CD):
 
 ```bash
-# Check test users exist
-npx tsx src/test/get-test-data.ts
+# Get Auth0 JWT token for API testing
+docker exec flora-backend pnpm get-token
 
-# View database in GUI
-npx prisma studio
+# Send test email to verify email service
+docker exec flora-backend pnpm test:live-email
 ```
 
-## 📊 What Each Test Verifies
+---
 
-1. **Simplified Flow**: Inline addresses, Melbourne delivery, no auto-creation
-2. **Management**: Pause, resume, update subscription operations
-3. **Spontaneous**: User-triggered deliveries work correctly
-4. **Order Integration**: Subscriptions create real orders through OrderService
-5. **Melbourne Delivery**: Postcode validation and pricing system
-6. **Error Handling**: Graceful failure with proper error messages
+## ✅ Before You Push - Pre-Commit Checklist
 
-## 🎯 Success Criteria
+**Always run these commands before pushing code:**
 
-**For Demo Day:**
-- ✅ All 6 automated tests pass
-- ✅ Melbourne delivery endpoints working
-- ✅ Subscription creation with Auth0 user
-- ✅ Orders created automatically for recurring subscriptions
-- ✅ Email confirmations sent (via OrderService)
-- ✅ Pause/resume/cancel functionality working
+```bash
+# 1️⃣ Run all backend tests (MUST PASS)
+docker exec flora-backend pnpm test --silent
+
+# 2️⃣ Type-check frontend (warnings OK)
+docker exec flora-frontend pnpm type-check || echo "Type warnings are OK"
+
+# 3️⃣ Build frontend in STRICT mode (simulates production deployment)
+docker exec flora-frontend sh -c "CI=true pnpm build:prod"
+
+# 4️⃣ Verify containers are running
+docker ps
+```
+
+**Expected results:**
+- ✅ All backend tests pass (80 tests)
+- ✅ Frontend type-check runs (warnings allowed)
+- ✅ Frontend builds successfully with NO warnings/errors
+- ✅ All containers running
+
+**If any step fails, fix it before pushing!**
+
+---
+
+## 🏗️ Understanding Build Commands
+
+### **Development Build (Fast, Warnings OK)**
+```bash
+docker exec flora-frontend pnpm build
+```
+- ⚡ Fast iteration during development
+- ⚠️ Shows warnings but doesn't fail
+- 🔧 Good for local testing
+
+### **Production Build (Strict, Deployment-Ready)**
+```bash
+# Option 1: Using build:prod script
+docker exec flora-frontend pnpm build:prod
+
+# Option 2: Using CI environment variable (same result)
+docker exec flora-frontend sh -c "CI=true pnpm build"
+```
+- ❌ **Fails on ANY warnings** (unused variables, imports, etc.)
+- ✅ Matches what Render/AWS/Vercel do automatically
+- 🎯 Ensures clean, production-ready code
+- 📦 Smaller bundle size (tree-shaking optimization)
+
+**Why use strict mode before deployment?**
+- Catches deployment issues early (before waiting for cloud build)
+- Forces clean code (no unused variables/imports)
+- Saves time (prevents failed deployments)
+- Professional code quality
+
+**When each platform uses strict mode:**
+
+| Platform | Sets CI=true? | When to Use Locally |
+|----------|--------------|---------------------|
+| **Render** | ✅ Automatic | `CI=true pnpm build` before pushing |
+| **Vercel** | ✅ Automatic | `CI=true pnpm build` before pushing |
+| **AWS Amplify** | ✅ Automatic | `CI=true pnpm build` before pushing |
+| **AWS EC2/Docker** | ⚠️ Manual | Set in Dockerfile: `ENV CI=true` |
+| **AWS S3** | ⚠️ Manual | Run `CI=true pnpm build` in CI/CD |
+
+---
 
 ## 🔄 CI/CD Integration
 
-The automated tests can be run in GitHub Actions for continuous integration:
+### **Automated Testing Pipeline**
 
-```yaml
-# .github/workflows/test.yml
-- name: Test Subscriptions
-  run: |
-    docker exec flora-backend pnpm test:subscriptions
+**Triggers:**
+- Every push to team branches: `main`, `li-dev`, `anth-branch`, `bevan-branch`, `xiaoling`
+- All pull requests to `main` branch
+
+**GitHub Actions Workflow Files:**
+```
+.github/workflows/test.yml       # Main testing pipeline
+.github/workflows/security.yml   # Weekly security audits
 ```
 
-This ensures subscription functionality works on every code push!
+### **Current CI Configuration**
+
+**Active Jobs:**
+
+1. **🧪 Backend Tests** ✅ ACTIVE
+   - All Jest test suites (80 tests)
+   - Code coverage reporting
+   - PostgreSQL database tests
+   - Auth, Orders, Payments, Email, AI tests
+
+2. **🎨 Frontend Tests** ⏸️ DISABLED (Local verification only)
+   - Reason: CI environment setup issues during development
+   - Local verification: `docker exec flora-frontend pnpm build`
+   - Re-enable after graduation: See `.github/workflows/test.yml`
+
+3. **🔍 Type Checking** ⏸️ DISABLED (Local verification only)
+   - Reason: Warnings allowed during active development
+   - Local verification: `docker exec flora-frontend pnpm type-check`
+   - Re-enable after graduation: See `.github/workflows/test.yml`
+
+> **Note:** CI is simplified to backend tests during active development. All tests pass locally!
+
+---
+
+## 📊 CI/CD Pipeline Architecture
+
+```
+GitHub Push/PR
+    ↓
+GitHub Actions Triggered
+    ↓
+┌─────────────────────────────────────┐
+│  Setup Environment                  │
+│  - Node.js 18                       │
+│  - pnpm package manager             │
+│  - PostgreSQL database              │
+└─────────────────────────────────────┘
+    ↓
+┌─────────────────────────────────────┐
+│  Install Dependencies               │
+│  - pnpm install                     │
+│  - Cache dependencies for speed     │
+└─────────────────────────────────────┘
+    ↓
+┌─────────────────────────────────────┐
+│  Backend Tests (ACTIVE)             │
+│  - Database migrations              │
+│  - Seed test data                   │
+│  - Run Jest test suites (80 tests)  │
+│  - Generate coverage report         │
+└─────────────────────────────────────┘
+    ↓
+┌─────────────────────────────────────┐
+│  Results                            │
+│  ✅ All tests pass → Merge allowed  │
+│  ❌ Tests fail → Merge blocked      │
+└─────────────────────────────────────┘
+```
+
+**View CI/CD results:**
+- Navigate to: https://github.com/Aldore-88/holbertonschool-final_project/actions
+- Click on workflow run → Select job → View logs
+- Re-run failed jobs using "Re-run jobs" button
+
+---
+
+## 🚨 Troubleshooting Failed Tests
+
+### **Common Issues & Solutions**
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| `Tests failed` | Broken functionality | Run `docker exec flora-backend pnpm test` locally to debug |
+| `Build failed` | TypeScript errors | Run `docker exec flora-backend pnpm build` locally |
+| `Lint failed` | Code style issues | Run `docker exec flora-frontend pnpm lint --fix` |
+| `type-check script not found` | Missing script in package.json | Rebuild: `pnpm docker:dev:build` |
+| `Database connection error` | Database not running | Run `pnpm docker:restart-backend && pnpm docker:setup` |
+| `Auth0 token invalid` | Test token expired | Tests use mocked tokens - check `src/test/setup.ts` |
+| `No products found` | Database not seeded | Run `docker exec flora-backend pnpm db:seed` |
+
+### **Development Workflow**
+
+1. 🔧 Make code changes locally
+2. 🧪 Run pre-commit checklist (see above)
+3. 📤 Push to your branch
+4. 👀 Monitor GitHub Actions results
+5. 🔄 Fix any failures and push again
+
+---
+
+## 📈 Code Coverage
+
+**Coverage goals:**
+- Statements: 80%+
+- Branches: 75%+
+- Functions: 80%+
+- Lines: 80%+
+
+**View coverage report:**
+```bash
+# Generate coverage report
+docker exec flora-backend pnpm test:coverage
+
+# View HTML report in browser
+open apps/backend/coverage/lcov-report/index.html
+```
+
+**CI/CD tracking:**
+- Coverage reports uploaded to GitHub Actions artifacts
+- Trends visible in workflow logs
+- Coverage badge (optional): Add to README
+
+---
+
+## 🔒 Security Scanning
+
+**Automated weekly scans:**
+```yaml
+# .github/workflows/security.yml
+- pnpm audit          # Check for known vulnerabilities
+- Dependency review   # Review new dependencies in PRs
+```
+
+**Manual security checks:**
+```bash
+# Check for vulnerabilities
+pnpm audit
+
+# Fix auto-fixable vulnerabilities
+pnpm audit --fix
+
+# View detailed report
+pnpm audit --json > audit-report.json
+```
+
+---
+
+## 🎯 Test Quality Standards
+
+### **All tests must:**
+- ✅ Run independently (no test order dependencies)
+- ✅ Clean up after themselves (no database pollution)
+- ✅ Use realistic test data (match production scenarios)
+- ✅ Have descriptive names (e.g., `should create order when payment succeeds`)
+- ✅ Test both success and error cases
+- ✅ Mock external services (Auth0, Stripe, Email, AI)
+
+### **Code review checklist:**
+- ✅ New features include tests
+- ✅ Tests cover edge cases
+- ✅ No hardcoded credentials or secrets
+- ✅ Error messages are clear and helpful
+- ✅ Tests are fast (< 1 second each)
+
+---
+
+## 🏆 CI/CD Best Practices We Follow
+
+- ✅ **Branch Protection:** All tests must pass before merging to `main`
+- ✅ **Parallel Execution:** Fast feedback with concurrent jobs
+- ✅ **Real Database:** PostgreSQL in CI matches production
+- ✅ **Code Coverage:** Track test coverage trends over time
+- ✅ **Security Scanning:** Weekly dependency vulnerability checks
+- ✅ **Type Safety:** TypeScript compilation prevents runtime errors
+
+---
+
+## 📚 Additional Resources
+
+- **[README.md](../README.md)** - Project overview and quick start
+- **[Development Guide](DEVELOPMENT.md)** - Daily development workflow
+- **[Database Guide](DATABASE.md)** - Prisma migrations and schema
+
+---
+
+**Testing ensures code quality and prevents bugs!** 🌸

@@ -134,10 +134,10 @@ const ProductDetail: React.FC = () => {
     selectedDate
     });
 
-    const message = isSubscription
-    ? `Added ${product.name} (${selectedFrequency} subscription) to cart!`
-    : `Added ${product.name} to cart!`;
-
+    // Alert message (currently not displayed)
+    // const message = isSubscription
+    //   ? `Added ${product.name} (${selectedFrequency} subscription) to cart!`
+    //   : `Added ${product.name} to cart!`;
     // alert(message);
     navigate('/cart');
     window.scrollTo({ top: 0, behavior: 'smooth' });

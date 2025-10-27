@@ -110,9 +110,10 @@ jobs:
 
   # Frontend and type-check jobs temporarily disabled
   # All tests pass locally - focusing on backend tests for CI
-  # TODO: Re-enable after graduation when we have time to debug CI environment
+  # Frontend tested locally with: docker exec flora-frontend sh -c "CI=true pnpm build:prod"
+  # Re-enable after graduation if needed
 
-  # frontend-tests:
+  # frontend-build:
   #   runs-on: ubuntu-latest
   #   steps:
   #   - name: Checkout code
@@ -127,10 +128,12 @@ jobs:
   #       version: 8
   #   - name: Install dependencies
   #     run: pnpm install
-  #   - name: Build frontend
+  #   - name: Build frontend (strict mode)
+  #     env:
+  #       CI: true
   #     run: |
   #       cd apps/frontend
-  #       pnpm build
+  #       pnpm build:prod
 
   # type-check:
   #   runs-on: ubuntu-latest
