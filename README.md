@@ -229,10 +229,20 @@ Detailed guides for development, testing, and database management:
 
 ---
 
-## 🚢 Deployment
+## 🚀 Future Development
 
-**Current Status:** Development environment
-**Deployment:** Planned for post-graduation
+Features planned for post-graduation development:
+
+**User Experience Enhancements:**
+- 📱 Mobile responsive design
+- 👤 User preferences and saved favorites
+- 📦 Advanced delivery tracking system
+- ⭐ Product reviews and ratings
+
+**Platform Features:**
+- 🛠️ Admin dashboard for platform management
+- 🏪 Seller dashboard for vendor management
+- 🤖 AI-powered product description generator for sellers
 
 ---
 
@@ -240,8 +250,8 @@ Detailed guides for development, testing, and database management:
 
 Built with ❤️ by the Holberton School team:
 
-- **Anthony** - [GitHub](https://github.com/Aldore-88)
-- **Bevan**
+- **Bevan** - [GitHub](https://github.com/Aldore-88)
+- **Anthony**
 - **Xiaoling**
 - **Lily**
 
@@ -253,13 +263,4 @@ MIT License - This project is for educational and demonstration purposes.
 
 ---
 
-## 🙏 Acknowledgments
-
-- Holberton School for guidance and support
-- Auth0 for authentication infrastructure
-- Stripe for payment processing
-- All open-source libraries that made this project possible
-
----
-
-**Built as a Holberton School Final Project | 2024**
+**Holberton School Final Project | 2025**
