@@ -1,10 +1,16 @@
-# 🌸 Flora - Flowers & Plants Marketplace
+# 🌸 Flora - Flowers Marketplace
 
 **Team:** Anthony, Bevan, Xiaoling, and Lily | **Holberton Final Project**
 
-**Built with ❤️ and lots of learning!**
-
 _Flora - Where every purchase blooms into joy_ 🌸
+
+<br>
+
+<div align="center">
+  <img src="docs/images/flora-hero.png" alt="Flora Marketplace Screenshot" width="100%" />
+</div>
+
+<br>
 
 Flora is a modern flowers and plants marketplace featuring flexible purchasing options including one-time purchases and subscription services. Built with React + TypeScript, Node.js/Express, Prisma, PostgreSQL, and Docker.
 
@@ -12,7 +18,20 @@ Flora is a modern flowers and plants marketplace featuring flexible purchasing o
 
 ## 📸 Demo
 
-🚀 **Live Demo:** [Coming Soon]
+### 🌐 Live Application
+
+**👉 [https://flora-4h2n.onrender.com](https://flora-4h2n.onrender.com)** - Deployed on Render
+
+_⏱️ First load may take 30-60 seconds as the backend wakes from idle state_
+
+**Try these features:**
+
+- 🔍 Search with auto-suggestions (try "rose" or "lily")
+- 🎨 Filter products by color, mood, occasion, or price
+- 🛒 Add items to cart and explore guest checkout
+- 🔐 Login with Google to try subscription features
+- 📅 Schedule deliveries for different dates
+- 🤖 Generate AI-powered gift messages
 
 <!-- Add screenshots/GIFs here after deployment -->
 
@@ -20,55 +39,28 @@ Flora is a modern flowers and plants marketplace featuring flexible purchasing o
 
 ## ✨ Features
 
-### 🔍 Smart Search & Discovery
-- **Intelligent Search** - Real-time auto-suggestions as you type, helping users find products faster
-- **Keyboard Accessible** - Full keyboard navigation support (Enter to search, arrow keys for suggestions)
-- **Screen Reader Friendly** - WCAG-compliant accessibility for visually impaired users
-- **Helpful Empty States** - Smart tips and suggestions when no results found
+### Core Shopping Experience
 
-### 🎯 Advanced Filtering & Sorting
-- **Multi-Criteria Filtering** - Filter by:
-  - 💰 Price ranges
-  - 🎨 Colors (Red, Pink, Yellow, White, etc.)
-  - 💐 Moods (Romantic, Cheerful, Elegant)
-  - 🌸 Seasons (Spring, Summer, Autumn, Winter)
-  - 🎉 Occasions (Birthday, Wedding, Anniversary, etc.)
-  - 🌺 Flower Types (Roses, Lilies, Orchids, etc.)
-- **Smart Pagination** - Seamless navigation through large product catalogs
-- **Filter Persistence** - Filters work together with search and pagination
-
-### 🛍️ Enhanced Shopping Experience
-- **Product Discovery** - Beautiful grid layout with high-quality images
-- **Stock Indicators** - Real-time "IN STOCK" badges
-- **Quick Actions** - "View Details" and "Add to Cart" for efficient shopping
-- **Guest Checkout** - No account required for one-time purchases
-- **Secure Authentication** - Auth0 integration (email/password + Google OAuth)
+- 🛍️ **Product Browsing** - Intelligent Search and Multi-Criteria Filtering
+- 🎁 **Guest Checkout** - No account required for one-time purchases
+- 🔐 **User Authentication** - Secure login with Auth0 (email/password + Google)
+- 🤖 **AI Gift Messages** - Generate personalized messages with Gemini AI based on keywords and tone
 
 ### Purchase Options
+
 - **One-Time Purchase** - Single delivery with instant checkout
 - **Recurring Subscription** - Regular deliveries (weekly/fortnightly/monthly) with savings
 - **Spontaneous Subscription** - Surprise deliveries at random times with frequency of weekly/fortnightly/monthly.
 
-### 📦 Scalable Delivery & Flexible Scheduling
-- **Multiple Delivery Dates** - Choose different delivery dates for different items
-- **Smart Shipping Breakdown** - Automatic calculation showing shipping cost per delivery date
-- **Two Delivery Options** - Standard ($8.99 AUD) or Express ($15.99 AUD)
-- **Melbourne Coverage** - Delivery to 100+ postcodes with postcode validation
-- **Postcode Validation** - Real-time validation during checkout
-- **Expansion-Ready** - Infrastructure built to support multi-city rollout
-- **Clear Availability Messaging** - Users see "Currently Available" for supported regions
+### 💳 Checkout & Delivery
 
-### 🤖 AI-Powered Features
-- **Gift Message Generator** - Gemini AI creates personalized messages based on keywords, tone and recipient
-
-### 📧 Order Management & Notifications
-- 💳 **Stripe Integration** - Secure payment processing
-- **Order Confirmation Page** - Detailed summary with order number and tracking
-- **Email Notifications** - Automated order confirmation emails
-- **Multi-Item Orders** - Support for different delivery dates per item with clear breakdown
-
+- **Stripe Payment Integration** - Secure payment processing with multiple payment methods
+- **Flexible Delivery Scheduling** - Choose different dates for each item with smart shipping breakdown
+- **Melbourne Metro Coverage** - 100+ postcodes with validation (expansion-ready infrastructure)
+- **Order Confirmation** - Detailed summary page with automated email notifications
 
 ### User Account Management
+
 - 📊 **Profile Dashboard** - View orders, subscriptions, and total spending
 - 📦 **Order History** - Browse past purchases with pagination
 - ⚙️ **Subscription Control** - Pause, resume, or cancel active subscriptions
@@ -78,12 +70,14 @@ Flora is a modern flowers and plants marketplace featuring flexible purchasing o
 ## 🛠️ Tech Stack
 
 **Frontend**
+
 - React 19 + TypeScript
 - Vite (development & build tool)
 - Auth0 (authentication)
 - Custom CSS styling
 
 **Backend**
+
 - Node.js + Express + TypeScript
 - Prisma ORM + PostgreSQL
 - Auth0 JWT authentication
@@ -91,6 +85,7 @@ Flora is a modern flowers and plants marketplace featuring flexible purchasing o
 - Email service integration
 
 **DevOps**
+
 - Docker containerization
 - pnpm workspaces (monorepo)
 - GitHub Actions CI/CD
@@ -149,6 +144,7 @@ Flora is a modern flowers and plants marketplace featuring flexible purchasing o
 ```
 
 **Key Data Flows:**
+
 1. **Authentication:** User login → Auth0 → JWT token → Frontend → Backend validates JWT
 2. **Shopping:** Browse products → Add to cart → Checkout → Stripe payment → Create order
 3. **Subscriptions:** Choose subscription options (Recurring or Spontaneous) with frequency → Schedule recurring orders → Check and manage subscriptions in My Subscriptions page
@@ -189,6 +185,7 @@ holbertonschool-final_project/
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - **Docker Desktop** (recommended) or Node.js 18+
 - **pnpm** package manager: `npm install -g pnpm`
 
@@ -212,9 +209,9 @@ pnpm docker:dev:bg
 ### Access the Application
 
 - **Frontend:** http://localhost:5173
-(_Check frontend logs: `docker logs flora-frontend` or `pnpm docker:logs frontend --tail 10`_)
+  (_Check frontend logs: `docker logs flora-frontend` or `pnpm docker:logs frontend --tail 10`_)
 - **Backend API:** http://localhost:3001 (_Check backend logs:
-`docker logs flora-backend --tail 10` or `pnpm docker:logs backend --tail 5`_)
+  `docker logs flora-backend --tail 10` or `pnpm docker:logs backend --tail 5`_)
 - **Health Check:** http://localhost:3001/api/health
 - **Database GUI:** Run `npx prisma studio`
 
@@ -223,6 +220,7 @@ pnpm docker:dev:bg
 Create `.env` files in both `apps/frontend/` and `apps/backend/` directories. See `.env.example` files for required variables.
 
 **Key environment variables:**
+
 - Auth0 credentials (Domain, Client ID, Audience)
 - Database connection string
 - Stripe API keys
@@ -253,9 +251,9 @@ docker exec flora-backend pnpm test:coverage
 
 Detailed guides for development, testing, and database management:
 
-- **[Development Guide](docs/DEVELOPMENT.md)** - Daily workflow, Docker commands, troubleshooting
+- **[Docker Setup Guide](docs/DOCKER_GUIDE.md)** - Daily workflow, Docker commands, troubleshooting
 - **[Database Guide](docs/DATABASE.md)** - Prisma migrations, schema changes, seeding
-- **[Testing Guide](docs/TESTING_GUIDE.md)** - Comprehensive testing documentation, CI/CD pipeline
+- **[Testing and CI/CD Guide](docs/TESTING_GUIDE.md)** - Comprehensive testing documentation, CI/CD pipeline
 
 ---
 
@@ -264,12 +262,14 @@ Detailed guides for development, testing, and database management:
 Features planned for post-graduation development:
 
 **User Experience Enhancements:**
+
 - 📱 Mobile responsive design
 - 👤 User preferences and saved favorites
 - 📦 Advanced delivery tracking system
 - ⭐ Product reviews and ratings
 
 **Platform Features:**
+
 - 🛠️ Admin dashboard for platform management
 - 🏪 Seller dashboard for vendor management
 - 🤖 AI-powered product description generator for sellers
@@ -278,7 +278,7 @@ Features planned for post-graduation development:
 
 ## 👥 Team
 
-Built with ❤️ by the Holberton School team:
+_Flora Team:_
 
 - **Bevan** - [GitHub](https://github.com/Aldore-88)
 - **Anthony**
@@ -293,4 +293,4 @@ MIT License - This project is for educational and demonstration purposes.
 
 ---
 
-**Holberton School Final Project | 2025**
+**Holberton School Final Project | Flora Team | 2025**

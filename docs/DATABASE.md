@@ -497,7 +497,7 @@ prisma.$use(async (params, next) => {
 
 - **[Prisma Documentation](https://www.prisma.io/docs)** - Official docs
 - **[README.md](../README.md)** - Project overview
-- **[Development Guide](DEVELOPMENT.md)** - Daily development workflow
+- **[Development Guide](DOCKER_GUIDE.md)** - Daily development workflow
 - **[Testing Guide](TESTING_GUIDE.md)** - Testing documentation
 
 ---
