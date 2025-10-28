@@ -20,28 +20,58 @@ Flora is a modern flowers and plants marketplace featuring flexible purchasing o
 
 ## ✨ Features
 
-### Core Shopping Experience
-- 🛍️ **Product Browsing** - Search and filter flowers, plants, and bundles
-- 🎁 **Guest Checkout** - No account required for one-time purchases
-- 🔐 **User Authentication** - Secure login with Auth0 (email/password + Google)
-- 📅 **Delivery Scheduling** - Choose specific delivery dates (1-90 days ahead)
-- 🤖 **AI Gift Messages** - Generate personalized messages with Gemini AI
+### 🔍 Smart Search & Discovery
+- **Intelligent Search** - Real-time auto-suggestions as you type, helping users find products faster
+- **Keyboard Accessible** - Full keyboard navigation support (Enter to search, arrow keys for suggestions)
+- **Screen Reader Friendly** - WCAG-compliant accessibility for visually impaired users
+- **Helpful Empty States** - Smart tips and suggestions when no results found
+
+### 🎯 Advanced Filtering & Sorting
+- **Multi-Criteria Filtering** - Filter by:
+  - 💰 Price ranges
+  - 🎨 Colors (Red, Pink, Yellow, White, etc.)
+  - 💐 Moods (Romantic, Cheerful, Elegant)
+  - 🌸 Seasons (Spring, Summer, Autumn, Winter)
+  - 🎉 Occasions (Birthday, Wedding, Anniversary, etc.)
+  - 🌺 Flower Types (Roses, Lilies, Orchids, etc.)
+- **Smart Pagination** - Seamless navigation through large product catalogs
+- **Filter Persistence** - Filters work together with search and pagination
+
+### 🛍️ Enhanced Shopping Experience
+- **Product Discovery** - Beautiful grid layout with high-quality images
+- **Stock Indicators** - Real-time "IN STOCK" badges
+- **Quick Actions** - "View Details" and "Add to Cart" for efficient shopping
+- **Guest Checkout** - No account required for one-time purchases
+- **Secure Authentication** - Auth0 integration (email/password + Google OAuth)
 
 ### Purchase Options
 - **One-Time Purchase** - Single delivery with instant checkout
 - **Recurring Subscription** - Regular deliveries (weekly/fortnightly/monthly) with savings
 - **Spontaneous Subscription** - Surprise deliveries at random times with frequency of weekly/fortnightly/monthly.
 
+### 📦 Scalable Delivery & Flexible Scheduling
+- **Multiple Delivery Dates** - Choose different delivery dates for different items
+- **Smart Shipping Breakdown** - Automatic calculation showing shipping cost per delivery date
+- **Two Delivery Options** - Standard ($8.99 AUD) or Express ($15.99 AUD)
+- **Melbourne Coverage** - Delivery to 100+ postcodes with postcode validation
+- **Postcode Validation** - Real-time validation during checkout
+- **Expansion-Ready** - Infrastructure built to support multi-city rollout
+- **Clear Availability Messaging** - Users see "Currently Available" for supported regions
+
+### 🤖 AI-Powered Features
+- **Gift Message Generator** - Gemini AI creates personalized messages based on keywords, tone and recipient
+
+### 📧 Order Management & Notifications
+- 💳 **Stripe Integration** - Secure payment processing
+- **Order Confirmation Page** - Detailed summary with order number and tracking
+- **Email Notifications** - Automated order confirmation emails
+- **Multi-Item Orders** - Support for different delivery dates per item with clear breakdown
+
+
 ### User Account Management
 - 📊 **Profile Dashboard** - View orders, subscriptions, and total spending
 - 📦 **Order History** - Browse past purchases with pagination
 - ⚙️ **Subscription Control** - Pause, resume, or cancel active subscriptions
-
-### Delivery & Payments
-- 🚚 **Melbourne Coverage** - 100+ postcodes with validation
-- 💰 **Flat-Rate Pricing** - $8.99 AUD standard, $15.99 express delivery, pickup in store
-- 💳 **Stripe Integration** - Secure payment processing
-- 📧 **Order Confirmations** - Automated email notifications
 
 ---
 
@@ -114,14 +144,14 @@ Flora is a modern flowers and plants marketplace featuring flexible purchasing o
                                             │ • Products     │
                                             │ • Orders       │
                                             │ • Subscriptions│
-                                            │ • DeliveryZones│
+                                            │ • Payments     │
                                             └────────────────┘
 ```
 
 **Key Data Flows:**
 1. **Authentication:** User login → Auth0 → JWT token → Frontend → Backend validates JWT
 2. **Shopping:** Browse products → Add to cart → Checkout → Stripe payment → Create order
-3. **Subscriptions:** Create subscription → Schedule recurring orders → Auto-process deliveries
+3. **Subscriptions:** Choose subscription options (Recurring or Spontaneous) with frequency → Schedule recurring orders → Check and manage subscriptions in My Subscriptions page
 4. **Orders:** Process payment → Save to database → Send confirmation email
 
 ---

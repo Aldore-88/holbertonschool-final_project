@@ -8,8 +8,8 @@ const Footer: React.FC = () => {
       {/* Acknowledgment Section */}
       <div className="acknowledgment-section">
         <div className="flags">
-          <img src="src/assets/flag-1.svg"></img>
-          <img src="src/assets/flag-2.svg"></img>
+          <img src="/assets/flag-1.svg" alt="Aboriginal flag"></img>
+          <img src="/assets/flag-2.svg" alt="Torres Strait Islander flag"></img>
         </div>
         <p className="acknowledgment-text">
           Flora acknowledges the Traditional Owners of Country throughout Australia and acknowledges
@@ -24,9 +24,9 @@ const Footer: React.FC = () => {
         <div className="footer-brand">
           <div className="logo-image">
           <a href="/">
-            <img src="src/assets/flora-logo.svg" alt="flora logo" width="75px">
+            <img src="/assets/flora-logo.svg" alt="flora logo" width="75px">
             </img>
-            <img src="src/assets/flora-text-cursive.svg" alt="flora text" width="150px">
+            <img src="/assets/flora-text-cursive.svg" alt="flora text" width="150px">
             </img>
           </a>
           </div>

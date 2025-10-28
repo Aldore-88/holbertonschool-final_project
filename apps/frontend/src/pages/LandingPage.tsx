@@ -98,7 +98,7 @@ const LandingPage: React.FC = () => {
       <div className="details-container">
         <div id="flower" className="details-card">
           <div className="details-icon">
-            <img src="/src/assets/flower-icon.svg"></img>
+            <img src="/assets/flower-icon.svg" alt="Flower icon"></img>
           </div>
           <div className="details-text">
             <h4>Spontatous Subscription</h4>
@@ -108,17 +108,17 @@ const LandingPage: React.FC = () => {
 
         <div id="calendar" className="details-card">
           <div className="details-icon">
-            <img src="/src/assets/calendar-icon.svg"></img>
+            <img src="/assets/calendar-icon.svg" alt="Calendar icon"></img>
           </div>
           <div className="details-text">
             <h4>Reoccurring Subscription</h4>
             <p>Set up a gift on repeat! With our subscription, you can send a gift for any occasion.</p>
           </div>
         </div>
-      
+
         <div id="colour" className="details-card">
           <div className="details-icon">
-            <img src="/src/assets/colour-icon.svg"></img>
+            <img src="/assets/colour-icon.svg" alt="Colour palette icon"></img>
           </div>
           <div className="details-text">
             <h4>Mood Picker</h4>
@@ -128,7 +128,7 @@ const LandingPage: React.FC = () => {
 
         <div id="details" className="details-card">
           <div className="details-icon">
-            <img src="/src/assets/delivery-icon.svg"></img>
+            <img src="/assets/delivery-icon.svg" alt="Delivery icon"></img>
           </div>
           <div className="details-text">
             <h4>Same Day Delivery</h4>
@@ -139,7 +139,7 @@ const LandingPage: React.FC = () => {
 
       <div className="picture-container">
         <div className="image-container">
-          <img src="./src/assets/landing-image.png"></img>
+          <img src="/assets/landing-image.png" alt="Flora flowers"></img>
         </div>
       </div>
 
@@ -147,7 +147,7 @@ const LandingPage: React.FC = () => {
         <div className="shop-by-card">
           <a href="/products">
             <div className="shop-by-image">
-              <img src="/src/assets/Filler1.jpg"></img>
+              <img src="/assets/Filler1.jpg" alt="Shop all products"></img>
             </div>
             <div className="shop-by-text">
                 <p>Shop By All</p>
@@ -158,7 +158,7 @@ const LandingPage: React.FC = () => {
         <div className="shop-by-card">
           <a href="/products?filter=colour">
           <div className="shop-by-image">
-            <img src="/src/assets/Filler2.jpg"></img>
+            <img src="/assets/Filler2.jpg" alt="Shop by colour"></img>
           </div>
           <div className="shop-by-text">
               <p>Shop By Colour</p>
@@ -169,7 +169,7 @@ const LandingPage: React.FC = () => {
         <div className="shop-by-card">
           <a href="/products?filter=occasion">
           <div className="shop-by-image">
-            <img src="/src/assets/Filler3.jpg"></img>
+            <img src="/assets/Filler3.jpg" alt="Shop by occasion"></img>
           </div>
           <div className="shop-by-text">
               <p>Shop By Occasion</p>
@@ -180,7 +180,7 @@ const LandingPage: React.FC = () => {
         <div className="shop-by-card">
           <a href="/products">
           <div className="shop-by-image">
-            <img src="/src/assets/Filler4.jpg"></img>
+            <img src="/assets/Filler4.jpg" alt="Bundle and save"></img>
           </div>
           <div className="shop-by-text">
               <p>Bundle Up and Save</p>
