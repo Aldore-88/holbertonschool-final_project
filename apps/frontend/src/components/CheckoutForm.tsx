@@ -60,7 +60,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
   selectedDeliveryType,
   onDeliveryTypeChange,
 }) => {
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const { state: cartState, setGiftMessage } = useCart();
   const [isEditingMessage, setIsEditingMessage] = useState(false);
   const [savedMessage, setSavedMessage] = useState({ to: "", from: "", message: "" });
@@ -91,6 +91,16 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof CheckoutFormData, string>>>({});
+
+  // Pre-fill email if user is logged in
+  useEffect(() => {
+    if (user?.email && !formData.guestEmail) {
+      setFormData((prev) => ({
+        ...prev,
+        guestEmail: user.email || "",
+      }));
+    }
+  }, [user]);
 
   // Load gift message from cart on mount and when cart changes
   useEffect(() => {
