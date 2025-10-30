@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useCart, groupItemsByDeliveryDate } from "../contexts/CartContext";
 import { useAuth } from "../contexts/AuthContext";
@@ -10,34 +10,49 @@ import "../styles/OrderConfirmationPage.css";
 const OrderConfirmationPage: React.FC = () => {
   const { orderId } = useParams<{ orderId: string }>();
   const { clearCart } = useCart();
-  const { getAccessToken } = useAuth();
+  const { getAccessToken, loading: authLoading, user } = useAuth();
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showShippingBreakdown, setShowShippingBreakdown] = useState(false);
 
-  useEffect(() => {
-    // Clear cart when order confirmation page loads
-    clearCart();
-
-    if (orderId) {
-      fetchOrder(orderId);
-    }
-  }, [orderId, clearCart]);
-
-  const fetchOrder = async (id: string) => {
+  const fetchOrder = useCallback(async (id: string) => {
+    let token: string | undefined;
     try {
-      const token = await getAccessToken();
+      if (user) {
+        try {
+          token = await getAccessToken();
+        } catch (tokenError) {
+          console.warn("Unable to get auth token for order fetch:", tokenError);
+        }
+      }
+
       const orderData = await orderService.getOrder(id, token);
       setOrder(orderData);
       setError(null);
     } catch (err: any) {
       console.error("Error fetching order:", err);
-      setError(err.response?.data?.error || "Failed to load order details");
+      if (user && !token) {
+        setError("We couldn't verify your order. Please refresh and sign in again.");
+      } else {
+        setError(err.response?.data?.error || "Failed to load order details");
+      }
     } finally {
       setLoading(false);
     }
-  };
+  }, [getAccessToken, user]);
+
+  useEffect(() => {
+    // Clear cart when order confirmation page loads
+    clearCart();
+  }, [clearCart]);
+
+  useEffect(() => {
+    if (!orderId) return;
+    if (authLoading) return;
+
+    fetchOrder(orderId);
+  }, [orderId, authLoading, user, fetchOrder]);
 
   const formatPrice = (cents: number) => {
     return `$${(cents / 100).toFixed(2)}`;
@@ -64,9 +79,20 @@ const OrderConfirmationPage: React.FC = () => {
   };
 
   const getCustomerName = () => {
+    // Prefer the authenticated user if we captured their profile name
+    if (order?.user?.firstName && order?.user?.lastName) {
+      return `${order.user.firstName} ${order.user.lastName}`;
+    }
+
+    // For guest checkouts, thank the purchaser (billing info) before the recipient
+    if (order?.billingFirstName && order?.billingLastName) {
+      return `${order.billingFirstName} ${order.billingLastName}`;
+    }
+
     if (order?.shippingFirstName && order?.shippingLastName) {
       return `${order.shippingFirstName} ${order.shippingLastName}`;
     }
+
     return "Valued Customer";
   };
 

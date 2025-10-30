@@ -11,9 +11,14 @@ interface GenerateMessageRequest {
 
 export class AIService {
   private genAI: GoogleGenerativeAI;
-  private model: any;
   private cache: Map<string, { message: string; timestamp: number }>;
   private CACHE_TTL = 3600000; // 1 hour cache
+  private readonly primaryModelName = "gemini-2.5-flash";
+  private readonly MAX_GENERATION_DURATION = 13500; // leave buffer under 15s frontend timeout
+  private readonly fallbackModelNames = [
+    "gemini-1.5-flash",
+    "gemini-1.5-flash-8b",
+  ];
 
   // Tone mapping - defined once as class property
   private readonly TONE_MAPPING: Record<string, string> = {
@@ -34,16 +39,115 @@ export class AIService {
     'congratulatory': 'congratulatory and proud'
   };
 
-  private async generateText(prompt: string, generationConfig?: {
-    temperature?: number;
-    maxOutputTokens?: number;
-    topP?: number;
-    topK?: number;
-  }): Promise<string> {
+  private getModel(modelName: string) {
+    return this.genAI.getGenerativeModel({ model: modelName });
+  }
+
+  private isTransientAIError(error: any): boolean {
+    const msg = String(error?.message || "").toLowerCase();
+    return (
+      msg.includes("overloaded") ||
+      msg.includes("unavailable") ||
+      msg.includes("503") ||
+      msg.includes("429") ||
+      msg.includes("quota")
+    );
+  }
+
+  private sleep(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  private async withTimeout<T>(promise: Promise<T>, timeoutMs: number, timeoutMessage: string): Promise<T> {
+    if (timeoutMs <= 0) {
+      throw new Error(timeoutMessage);
+    }
+
+    let timeoutHandle: NodeJS.Timeout | undefined;
+    try {
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        timeoutHandle = setTimeout(() => reject(new Error(timeoutMessage)), timeoutMs);
+      });
+      const result = await Promise.race([promise, timeoutPromise]);
+      return result as T;
+    } finally {
+      if (timeoutHandle) {
+        clearTimeout(timeoutHandle);
+      }
+    }
+  }
+
+  private getRemainingTime(startTime: number): number {
+    return this.MAX_GENERATION_DURATION - (Date.now() - startTime);
+  }
+
+  private async generateTextWithFallback(
+    prompt: string,
+    generationConfig?: {
+      temperature?: number;
+      maxOutputTokens?: number;
+      topP?: number;
+      topK?: number;
+    }
+  ): Promise<string> {
+    const modelsToTry = [this.primaryModelName, ...this.fallbackModelNames];
     const options = generationConfig ? { generationConfig } : undefined;
-    const result = await this.model.generateContent(prompt, options);
-    const response = await result.response;
-    return response.text();
+    const startTime = Date.now();
+
+    for (let m = 0; m < modelsToTry.length; m++) {
+      const modelName = modelsToTry[m];
+      const model = this.getModel(modelName);
+
+      // Allow at most one retry per model to keep total time low
+      const maxRetries = 1;
+      for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        const remaining = this.getRemainingTime(startTime);
+        if (remaining <= 0) {
+          throw new Error("AI generation timed out before completion");
+        }
+
+        try {
+          if (m > 0 && attempt === 0) {
+            console.warn(`⚠️  Falling back to model: ${modelName}`);
+          } else if (attempt > 0) {
+            console.warn(`⚠️  Retrying model ${modelName} (attempt ${attempt + 1})`);
+          }
+          const generationPromise = model.generateContent(prompt, options as any);
+          const result = await this.withTimeout(
+            generationPromise,
+            remaining,
+            "AI generation exceeded time limit"
+          );
+          const response = result.response;
+          return response.text();
+        } catch (err: any) {
+          const isTransient = this.isTransientAIError(err);
+
+          // Retry if transient and retries available
+          if (isTransient && attempt < maxRetries) {
+            const backoff = attempt === 0 ? 150 : 300;
+            console.warn(`⚠️  Transient AI error on ${modelName}, retrying in ${backoff}ms...`);
+
+            if (this.getRemainingTime(startTime) <= backoff) {
+              console.warn("⚠️  Skipping retry due to overall timeout constraint");
+              break;
+            }
+            await this.sleep(backoff);
+            continue;
+          }
+
+          // If transient error but no retries left, try next model
+          if (isTransient) {
+            break;
+          }
+
+          // Non-transient error: rethrow immediately
+          throw err;
+        }
+      }
+    }
+
+    throw new Error("All AI models failed due to transient errors");
   }
 
   /**
@@ -59,10 +163,13 @@ export class AIService {
    * Clean old cache entries to prevent memory bloat
    */
   private cleanupCache(): void {
-    if (this.cache.size > 100) {
-      const firstKey = this.cache.keys().next().value;
-      if (firstKey) {
-        this.cache.delete(firstKey);
+    const MAX_CACHE_SIZE = 100;
+    if (this.cache.size > MAX_CACHE_SIZE) {
+      // Remove oldest 20% of entries when limit is exceeded
+      const entriesToRemove = Math.ceil(this.cache.size * 0.2);
+      const keys = Array.from(this.cache.keys());
+      for (let i = 0; i < entriesToRemove; i++) {
+        this.cache.delete(keys[i]);
       }
     }
   }
@@ -75,10 +182,6 @@ export class AIService {
     }
 
     this.genAI = new GoogleGenerativeAI(apiKey || "");
-    // Use gemini-2.5-flash (free model)
-    this.model = this.genAI.getGenerativeModel({
-      model: "gemini-2.5-flash"
-    });
     this.cache = new Map();
   }
 
@@ -90,16 +193,15 @@ export class AIService {
       const { to, from, occasion, keywords, tone, userPrompt } = request;
       const sanitizedUserPrompt = userPrompt?.trim();
       const lengthSpec = '2-3 sentences';
-      const maxTokens = 80; // Reduced from 120 for faster generation
+      const maxTokens = 60; // Lower token limit = faster generation
 
-      // Create cache key (include detected length)
+      // Create cache key
       const cacheKey = JSON.stringify({
         to,
         from,
         occasion,
         keywords,
         tone,
-        lengthSpec,
         userPrompt: sanitizedUserPrompt,
       });
 
@@ -132,11 +234,11 @@ ${context}${context ? '\n' : ''}${userPromptLine}Rules: ${lengthSpec} only, no n
 Message:`;
 
       // Use optimized generation config for speed and quality
-      let text = (await this.generateText(prompt, {
-        temperature: 0.9, // Higher temperature for faster, more creative responses
+      let text = (await this.generateTextWithFallback(prompt, {
+        temperature: 0.7, // Lower temperature = faster sampling
         maxOutputTokens: maxTokens,
-        topP: 0.95, // Increased for more variety and speed
-        topK: 40,
+        topP: 0.9, // Reduced for faster token selection
+        topK: 30, // Lower = faster selection
       })).trim();
 
       // Post-process to remove any accidental names or greetings
@@ -172,7 +274,7 @@ Message:`;
 
       prompt += "Each message should be 1-2 sentences, warm and genuine. Return only the messages, numbered 1-3.";
 
-      const text = await this.generateText(prompt);
+      const text = await this.generateTextWithFallback(prompt);
 
       // Split by numbers and clean up
       const suggestions = text
