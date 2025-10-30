@@ -128,6 +128,35 @@ export class ProductService {
         }),
       ]);
 
+    // Define the correct logical order for price ranges (low to high)
+    const priceRangeOrder: PriceRange[] = [
+      'UNDER_25',
+      'RANGE_25_50',
+      'RANGE_50_75',
+      'RANGE_75_100',
+      'OVER_100',
+    ];
+
+    // Define the correct logical order for seasons (chronological)
+    const seasonOrder: Season[] = [
+      'ALL_SEASON',
+      'SPRING',
+      'SUMMER',
+      'FALL',
+      'WINTER',
+    ];
+
+    // Sort price ranges in logical order
+    const sortedPriceRanges = priceRanges
+      .map((p) => p.priceRange)
+      .sort((a, b) => priceRangeOrder.indexOf(a) - priceRangeOrder.indexOf(b));
+
+    // Sort seasons in logical order
+    const uniqueSeasons = [...new Set(seasons.flatMap((p) => p.seasons))];
+    const sortedSeasons = uniqueSeasons.sort(
+      (a, b) => seasonOrder.indexOf(a) - seasonOrder.indexOf(b)
+    );
+
     return {
       products,
       pagination: {
@@ -138,11 +167,11 @@ export class ProductService {
       },
       filters: {
         occasions: [...new Set(occasions.flatMap((p) => p.occasions))],
-        seasons: [...new Set(seasons.flatMap((p) => p.seasons))],
+        seasons: sortedSeasons,
         moods: [...new Set(moods.flatMap((p) => p.moods))],
         colors: [...new Set(colors.flatMap((p) => p.colors))],
         types: types.map((p) => p.type),
-        priceRanges: priceRanges.map((p) => p.priceRange),
+        priceRanges: sortedPriceRanges,
       },
     };
   }
