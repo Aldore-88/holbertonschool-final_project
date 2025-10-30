@@ -43,4 +43,4 @@ RUN pnpm run build
 EXPOSE 5173
 
 # Start command - serve production build with serve package
-CMD ["serve", "-s", "dist", "-l", "5173"]
+CMD ["serve", "-s", "dist", "-l", "5173", "--no-clipboard", "--single"]
