@@ -8,7 +8,8 @@ import { useCart } from "../contexts/CartContext";
 import deliveryService, { type DeliveryInfo } from "../services/deliveryService";
 import "../styles/CheckoutForm.css";
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "");
+// Initialize Stripe
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 export interface CheckoutFormData {
   deliveryType?: "STANDARD" | "EXPRESS" | "PICKUP";
@@ -188,7 +189,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
         }
       } catch (error) {
         // Graceful degradation: if validation service fails, allow checkout to continue
-        console.warn('Postcode validation service unavailable, allowing checkout:', error);
+        console.warn("Postcode validation service unavailable, allowing checkout:", error);
         // No error added - we don't block checkout for technical failures
       }
     }
@@ -562,8 +563,8 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
           </div>
 
           {!formData.useSameAddress && (
-        <div className="recipient-form">
-            <div className="form-field">
+            <div className="recipient-form">
+              <div className="form-field">
                 <label className="form-label-top">Country</label>
                 <input type="text" name="senderCountry" className="form-input" value="Australia" readOnly disabled />
               </div>
