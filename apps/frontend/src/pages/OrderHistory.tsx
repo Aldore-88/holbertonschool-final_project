@@ -2,20 +2,9 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import orderService from '../services/orderService';
-import type { Order } from '../services/orderService';
+import type { Order, OrdersResponse } from '../services/orderService';
 import { getImageUrl } from '../services/api';
 import '../styles/OrderHistory.css';
-
-interface OrdersResponse {
-  success: boolean;
-  data: Order[];
-  meta: {
-    currentPage: number;
-    itemsPerPage: number;
-    totalItems: number;
-    totalPages: number;
-  };
-}
 
 const OrderHistory = () => {
   const { user, loading: authLoading, getAccessToken } = useAuth();
@@ -55,8 +44,8 @@ const OrderHistory = () => {
 
         console.log('📊 DEBUG: Order history response:', response);
         setOrders(response.data || []);
-        setTotal(response.meta?.totalItems || 0);
-        setTotalPages(response.meta?.totalPages || 1);
+        setTotal(response.total || 0);
+        setTotalPages(response.totalPages || 1);
       } catch (err: any) {
         console.error('❌ Error fetching orders:', err);
         console.error('❌ Error response:', err.response?.data);

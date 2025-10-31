@@ -250,6 +250,12 @@ Features planned for post-graduation development:
 - 🏪 Seller dashboard for vendor management
 - 🤖 AI-powered product description generator for sellers
 
+**Payment & Subscription System:**
+
+- 💳 Stripe recurring billing integration for automated subscription payments
+- 🔄 Automated order creation and processing for scheduled deliveries
+- ⏸️ Full subscription management (pause, resume, cancel, skip delivery)
+
 ---
 
 ## 👥 Team
