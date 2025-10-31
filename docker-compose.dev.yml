@@ -32,6 +32,7 @@ services:
       - VITE_AUTH0_DOMAIN=dev-ijvur34mojpovh8e.us.auth0.com
       - VITE_AUTH0_CLIENT_ID=tegmEuc40IvXfYFDLIRnJmbsa1izkTVL
       - VITE_AUTH0_AUDIENCE=https://flora-api.com
+      - VITE_STRIPE_PUBLISHABLE_KEY=${VITE_STRIPE_PUBLISHABLE_KEY}
     command: ["pnpm", "dev", "--host", "0.0.0.0"]
     volumes:
       - ./apps/frontend:/app/apps/frontend

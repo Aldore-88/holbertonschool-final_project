@@ -13,8 +13,8 @@ export interface CreateOrderData {
     productId: string;
     quantity: number;
     priceCents: number;
-    subscriptionType?: string;
-    requestedDeliveryDate?: Date;
+    subscriptionType?: string;        // Item-level: individual item subscription
+    requestedDeliveryDate?: Date;     // Item-level: individual item delivery date
   }>;
   shippingAddress: {
     firstName: string;
@@ -40,7 +40,14 @@ export interface CreateOrderData {
   };
   deliveryType: 'STANDARD' | 'EXPRESS' | 'NEXT_DAY' | 'PICKUP';
   deliveryNotes?: string;
-  requestedDeliveryDate?: Date;
+  requestedDeliveryDate?: Date;       // Order-level: default/primary delivery date
+}
+
+export interface OrdersResponse {
+  data: Order[];
+  total: number;
+  page: number;
+  totalPages: number;
 }
 
 export interface Order {
@@ -48,14 +55,14 @@ export interface Order {
   orderNumber: string;
   status: string;
   purchaseType: string;
-  subscriptionType?: string;
+  subscriptionType?: string;        // Order-level subscription type
   totalCents: number;
   subtotalCents: number;
   shippingCents: number;
   taxCents: number;
   createdAt: string;
   deliveryType?: string;
-  requestedDeliveryDate?: string;
+  requestedDeliveryDate?: string;   // Order-level delivery date
   shippingFirstName?: string;
   shippingLastName?: string;
   shippingStreet1?: string;
@@ -74,6 +81,12 @@ export interface Order {
   billingZipCode?: string;
   billingCountry?: string;
   billingPhone?: string;
+  user?: {
+    id: string;
+    email: string;
+    firstName: string | null;
+    lastName: string | null;
+  } | null;
   items: Array<{
     id: string;
     productId: string;
@@ -105,30 +118,41 @@ class OrderService {
     return {}; // Guest checkout - no auth header
   };
 
-  async createOrder(orderData: CreateOrderData, token?: string): Promise<Order> {
+  /**
+   * Reusable error handler wrapper for API requests
+   */
+  private async handleRequest<T>(
+    requestFn: () => Promise<any>,
+    errorMessage: string
+  ): Promise<T> {
     try {
-      const headers = this.getAuthHeader(token);
-      const response = await axios.post(`${API_URL}/orders`, orderData, {
-        headers,
-      });
-      return response.data.data;
+      return await requestFn();
     } catch (error) {
-      console.error('Error creating order:', error);
+      console.error(errorMessage, error);
       throw error;
     }
   }
 
+  async createOrder(orderData: CreateOrderData, token?: string): Promise<Order> {
+    return this.handleRequest<Order>(
+      async () => {
+        const headers = this.getAuthHeader(token);
+        const response = await axios.post(`${API_URL}/orders`, orderData, { headers });
+        return response.data.data;
+      },
+      'Error creating order:'
+    );
+  }
+
   async getOrder(orderId: string, token?: string): Promise<Order> {
-    try {
-      const headers = this.getAuthHeader(token);
-      const response = await axios.get(`${API_URL}/orders/${orderId}`, {
-        headers,
-      });
-      return response.data.data;
-    } catch (error) {
-      console.error('Error fetching order:', error);
-      throw error;
-    }
+    return this.handleRequest<Order>(
+      async () => {
+        const headers = this.getAuthHeader(token);
+        const response = await axios.get(`${API_URL}/orders/${orderId}`, { headers });
+        return response.data.data;
+      },
+      'Error fetching order:'
+    );
   }
 
   async confirmOrder(
@@ -136,18 +160,18 @@ class OrderService {
     paymentIntentId: string,
     token?: string
   ): Promise<Order> {
-    try {
-      const headers = this.getAuthHeader(token);
-      const response = await axios.post(
-        `${API_URL}/orders/${orderId}/confirm`,
-        { paymentIntentId },
-        { headers }
-      );
-      return response.data.data;
-    } catch (error) {
-      console.error('Error confirming order:', error);
-      throw error;
-    }
+    return this.handleRequest<Order>(
+      async () => {
+        const headers = this.getAuthHeader(token);
+        const response = await axios.post(
+          `${API_URL}/orders/${orderId}/confirm`,
+          { paymentIntentId },
+          { headers }
+        );
+        return response.data.data;
+      },
+      'Error confirming order:'
+    );
   }
 
   /**
@@ -156,18 +180,18 @@ class OrderService {
    * @param page - Page number (default: 1)
    * @param limit - Items per page (default: 10)
    */
-  async getUserOrders(token: string, page: number = 1, limit: number = 10): Promise<any> {
-    try {
-      const headers = this.getAuthHeader(token);
-      const response = await axios.get(`${API_URL}/orders/user`, {
-        params: { page, limit },
-        headers,
-      });
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching user orders:', error);
-      throw error;
-    }
+  async getUserOrders(token: string, page: number = 1, limit: number = 10): Promise<OrdersResponse> {
+    return this.handleRequest<OrdersResponse>(
+      async () => {
+        const headers = this.getAuthHeader(token);
+        const response = await axios.get(`${API_URL}/orders/user`, {
+          params: { page, limit },
+          headers,
+        });
+        return response.data;
+      },
+      'Error fetching user orders:'
+    );
   }
 }
 

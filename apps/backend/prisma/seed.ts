@@ -54,9 +54,9 @@ const sampleProducts = [
     type: ProductType.ORCHID,
   },
   {
-    name: 'Sunflower Happiness Bouquet',
+    name: 'Sunny Joy Bouquet',
     description: 'A cheerful sunflower bouquet — bright, warm, and full of summer sunshine and positive energy.',
-    longDescription: 'Radiating pure happiness, this bouquet features a stunning sunflower surrounded by white daisies, baby\’s breath, and fresh greenery, wrapped in sunny yellow paper for a joyful touch. Perfect for summer, the sunflower symbolizes warmth, optimism, and strength — just like the season itself. Whether it\’s a birthday, congratulations, or a simple gesture of cheer, this bouquet captures the golden glow of summer days and the beauty of heartfelt positivity.',
+    longDescription: 'Radiating pure happiness, this bouquet features a stunning sunflower surrounded by white daisies, baby\'s breath, and fresh greenery, wrapped in sunny yellow paper for a joyful touch. Perfect for summer, the sunflower symbolizes warmth, optimism, and strength — just like the season itself. Whether it\'s a birthday, congratulations, or a simple gesture of cheer, this bouquet captures the golden glow of summer days and the beauty of heartfelt positivity.',
     priceCents: 3875, // $38.75
     priceRange: PriceRange.RANGE_25_50,
     imageUrl: '/images/Sunflowers.jpg',

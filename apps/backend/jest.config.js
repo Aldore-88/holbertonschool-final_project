@@ -1,5 +1,4 @@
 module.exports = {
-  preset: 'ts-jest',
   testEnvironment: 'node',
   roots: ['<rootDir>/src'],
   testMatch: [
@@ -7,7 +6,7 @@ module.exports = {
     '**/*.(test|spec).+(ts|tsx|js)'
   ],
   transform: {
-    '^.+\\.(ts|tsx)$': 'ts-jest',
+    '^.+\\.(ts|tsx)$': ['@swc/jest'],
   },
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
@@ -27,4 +26,6 @@ module.exports = {
   testTimeout: 10000,
   clearMocks: true,
   restoreMocks: true,
+  // Prevent worker timeout warnings from Jest's internal timing
+  workerIdleMemoryLimit: '512MB',
 };

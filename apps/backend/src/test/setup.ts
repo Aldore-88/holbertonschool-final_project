@@ -23,26 +23,25 @@ process.env.STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || 'sk_test_mock_k
 // Global test timeout
 jest.setTimeout(10000);
 
-// Mock console methods for cleaner test output
-const originalConsoleError = console.error;
-const originalConsoleWarn = console.warn;
-const originalConsoleLog = console.log;
+// Mock console methods for cleaner test output (only if needed)
+if (process.env.SUPPRESS_TEST_LOGS === 'true') {
+  const originalConsoleError = console.error;
+  const originalConsoleWarn = console.warn;
+  const originalConsoleLog = console.log;
 
-beforeEach(() => {
-  // Optionally suppress console outputs during tests
-  if (process.env.SUPPRESS_TEST_LOGS === 'true') {
+  beforeEach(() => {
     console.error = jest.fn();
     console.warn = jest.fn();
     console.log = jest.fn();
-  }
-});
+  });
 
-afterEach(() => {
-  // Restore console methods
-  console.error = originalConsoleError;
-  console.warn = originalConsoleWarn;
-  console.log = originalConsoleLog;
-});
+  afterEach(() => {
+    // Restore console methods
+    console.error = originalConsoleError;
+    console.warn = originalConsoleWarn;
+    console.log = originalConsoleLog;
+  });
+}
 
 // Global mocks for external services
 jest.mock('../config/database', () => ({
