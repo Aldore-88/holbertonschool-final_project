@@ -88,17 +88,17 @@ const SubscriptionsPage = () => {
     // IMPORTANT: Check BIWEEKLY before WEEKLY (BIWEEKLY contains substring "WEEKLY")
     if (type.includes('BIWEEKLY')) {
       frequency = 'Every 2 weeks';
-      discount = isSpontaneous ? 18 : 20;
+      discount = isSpontaneous ? 15 : 15;
     } else if (type.includes('WEEKLY')) {
       frequency = 'Every 1 week';
-      discount = isSpontaneous ? 15 : 15;
+      discount = isSpontaneous ? 20 : 20;
     } else if (type.includes('MONTHLY')) {
       frequency = 'Every 1 month';
-      discount = isSpontaneous ? 18 : 20;
+      discount = isSpontaneous ? 10 : 10;
     } else if (type === 'SPONTANEOUS') {
       // Legacy spontaneous type
       frequency = 'Every 2 weeks';
-      discount = 18;
+      discount = 15;
     }
 
     return {
@@ -297,24 +297,24 @@ const SubscriptionsPage = () => {
                   <div className="subscription-actions">
                     {subscription.status === 'ACTIVE' ? (
                       <>
-                        <button className="action-btn pause-btn">
+                        <button className="action-btn pause-btn" disabled style={{ opacity: 0.5, cursor: 'not-allowed' }}>
                           ⏸ Pause
                         </button>
-                        <button className="action-btn skip-btn">
+                        <button className="action-btn skip-btn" disabled style={{ opacity: 0.5, cursor: 'not-allowed' }}>
                           ⏭ Skip Next
                         </button>
                       </>
                     ) : subscription.status === 'PAUSED' ? (
-                      <button className="action-btn resume-btn">
+                      <button className="action-btn resume-btn" disabled style={{ opacity: 0.5, cursor: 'not-allowed' }}>
                         ▶ Resume
                       </button>
                     ) : null}
-                    <button className="action-btn cancel-btn">
+                    <button className="action-btn cancel-btn" disabled style={{ opacity: 0.5, cursor: 'not-allowed' }}>
                       Cancel
                     </button>
-                    {/* <span className="coming-soon-text">
-                      (Actions coming soon)
-                    </span> */}
+                    <span className="coming-soon-text" style={{ fontSize: '0.85rem', color: '#888', marginLeft: '1rem' }}>
+                      (Coming Soon)
+                    </span>
                   </div>
                 </div>
               </div>

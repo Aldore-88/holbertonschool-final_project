@@ -413,6 +413,19 @@
   font-family: "EB Garamond", sans-serif;
 }
 
+/* Active state - bright text on dark background for readability */
+.frequency-option-card.active .frequency-option-label {
+  color: #C8D7C4;
+}
+
+.frequency-option-card.active .frequency-option-description {
+  color: #C8D7C4;
+}
+
+.frequency-option-card.active .frequency-option-price {
+  color: #C8D7C4;
+}
+
 .frequency-option-savings {
   font-size: 0.8125rem;
   color: #0fad5e;
