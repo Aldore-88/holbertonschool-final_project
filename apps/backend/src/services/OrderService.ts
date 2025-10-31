@@ -77,6 +77,59 @@ export interface OrderWithDetails extends Order {
 export class OrderService {
   private emailService: EmailService;
 
+  // Reusable Prisma include structure for order queries
+  private readonly orderInclude = {
+    items: {
+      include: {
+        product: {
+          select: {
+            id: true,
+            name: true,
+            priceCents: true,
+            imageUrl: true,
+          },
+        },
+      },
+    },
+    user: {
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+      },
+    },
+    payments: {
+      select: {
+        id: true,
+        amountCents: true,
+        status: true,
+        paidAt: true,
+      },
+    },
+  };
+
+  // Status mapping constants
+  private readonly trackingStatusMap: Record<OrderStatus, string> = {
+    [OrderStatus.PENDING]: "PREPARING",
+    [OrderStatus.CONFIRMED]: "PREPARING",
+    [OrderStatus.PREPARING]: "PREPARING",
+    [OrderStatus.OUT_FOR_DELIVERY]: "OUT_FOR_DELIVERY",
+    [OrderStatus.DELIVERED]: "DELIVERED",
+    [OrderStatus.CANCELLED]: "CANCELLED",
+    [OrderStatus.REFUNDED]: "CANCELLED",
+  };
+
+  private readonly statusDescriptions: Record<OrderStatus, string> = {
+    [OrderStatus.PENDING]: "Order received and being processed",
+    [OrderStatus.CONFIRMED]: "Order confirmed and being prepared",
+    [OrderStatus.PREPARING]: "Your beautiful flowers are being prepared",
+    [OrderStatus.OUT_FOR_DELIVERY]: "Your order is out for delivery",
+    [OrderStatus.DELIVERED]: "Order has been successfully delivered",
+    [OrderStatus.CANCELLED]: "Order has been cancelled",
+    [OrderStatus.REFUNDED]: "Order has been refunded",
+  };
+
   constructor() {
     this.emailService = new EmailService();
   }
@@ -165,28 +218,7 @@ export class OrderService {
             })),
           },
         },
-        include: {
-          items: {
-            include: {
-              product: {
-                select: {
-                  id: true,
-                  name: true,
-                  priceCents: true,
-                  imageUrl: true,
-                },
-              },
-            },
-          },
-          user: {
-            select: {
-              id: true,
-              email: true,
-              firstName: true,
-              lastName: true,
-            },
-          },
-        },
+        include: this.orderInclude,
       });
 
       // Update product stock
@@ -225,36 +257,7 @@ export class OrderService {
 
     return await prisma.order.findFirst({
       where: whereClause,
-      include: {
-        items: {
-          include: {
-            product: {
-              select: {
-                id: true,
-                name: true,
-                priceCents: true,
-                imageUrl: true,
-              },
-            },
-          },
-        },
-        user: {
-          select: {
-            id: true,
-            email: true,
-            firstName: true,
-            lastName: true,
-          },
-        },
-        payments: {
-          select: {
-            id: true,
-            amountCents: true,
-            status: true,
-            paidAt: true,
-          },
-        },
-      },
+      include: this.orderInclude,
     });
   }
 
@@ -281,28 +284,7 @@ export class OrderService {
     const [orders, total] = await Promise.all([
       prisma.order.findMany({
         where: whereClause,
-        include: {
-          items: {
-            include: {
-              product: {
-                select: {
-                  id: true,
-                  name: true,
-                  priceCents: true,
-                  imageUrl: true,
-                },
-              },
-            },
-          },
-          payments: {
-            select: {
-              id: true,
-              amountCents: true,
-              status: true,
-              paidAt: true,
-            },
-          },
-        },
+        include: this.orderInclude,
         orderBy: { createdAt: "desc" },
         skip: offset,
         take: limit,
@@ -337,36 +319,7 @@ export class OrderService {
     const [orders, total] = await Promise.all([
       prisma.order.findMany({
         where,
-        include: {
-          items: {
-            include: {
-              product: {
-                select: {
-                  id: true,
-                  name: true,
-                  priceCents: true,
-                  imageUrl: true,
-                },
-              },
-            },
-          },
-          user: {
-            select: {
-              id: true,
-              email: true,
-              firstName: true,
-              lastName: true,
-            },
-          },
-          payments: {
-            select: {
-              id: true,
-              amountCents: true,
-              status: true,
-              paidAt: true,
-            },
-          },
-        },
+        include: this.orderInclude,
         orderBy: { createdAt: "desc" },
         skip: offset,
         take: limit,
@@ -396,36 +349,7 @@ export class OrderService {
           },
         },
       },
-      include: {
-        items: {
-          include: {
-            product: {
-              select: {
-                id: true,
-                name: true,
-                priceCents: true,
-                imageUrl: true,
-              },
-            },
-          },
-        },
-        user: {
-          select: {
-            id: true,
-            email: true,
-            firstName: true,
-            lastName: true,
-          },
-        },
-        payments: {
-          select: {
-            id: true,
-            amountCents: true,
-            status: true,
-            paidAt: true,
-          },
-        },
-      },
+      include: this.orderInclude,
     });
 
     // Create delivery tracking record
@@ -445,36 +369,7 @@ export class OrderService {
         status,
         actualDeliveryDate: status === OrderStatus.DELIVERED ? new Date() : undefined,
       },
-      include: {
-        items: {
-          include: {
-            product: {
-              select: {
-                id: true,
-                name: true,
-                priceCents: true,
-                imageUrl: true,
-              },
-            },
-          },
-        },
-        user: {
-          select: {
-            id: true,
-            email: true,
-            firstName: true,
-            lastName: true,
-          },
-        },
-        payments: {
-          select: {
-            id: true,
-            amountCents: true,
-            status: true,
-            paidAt: true,
-          },
-        },
-      },
+      include: this.orderInclude,
     });
 
     // Update delivery tracking
@@ -628,17 +523,7 @@ export class OrderService {
   }
 
   private async updateDeliveryTracking(orderId: string, status: OrderStatus): Promise<void> {
-    const trackingStatusMap: Record<OrderStatus, string> = {
-      [OrderStatus.PENDING]: "PREPARING",
-      [OrderStatus.CONFIRMED]: "PREPARING",
-      [OrderStatus.PREPARING]: "PREPARING",
-      [OrderStatus.OUT_FOR_DELIVERY]: "OUT_FOR_DELIVERY",
-      [OrderStatus.DELIVERED]: "DELIVERED",
-      [OrderStatus.CANCELLED]: "CANCELLED",
-      [OrderStatus.REFUNDED]: "CANCELLED",
-    };
-
-    const trackingStatus = trackingStatusMap[status];
+    const trackingStatus = this.trackingStatusMap[status];
     if (!trackingStatus) return;
 
     const tracking = await prisma.deliveryTracking.findUnique({
@@ -674,16 +559,6 @@ export class OrderService {
   }
 
   private getTrackingDescription(status: OrderStatus): string {
-    const descriptions: Record<OrderStatus, string> = {
-      [OrderStatus.PENDING]: "Order received and being processed",
-      [OrderStatus.CONFIRMED]: "Order confirmed and being prepared",
-      [OrderStatus.PREPARING]: "Your beautiful flowers are being prepared",
-      [OrderStatus.OUT_FOR_DELIVERY]: "Your order is out for delivery",
-      [OrderStatus.DELIVERED]: "Order has been successfully delivered",
-      [OrderStatus.CANCELLED]: "Order has been cancelled",
-      [OrderStatus.REFUNDED]: "Order has been refunded",
-    };
-
-    return descriptions[status] || "Order status updated";
+    return this.statusDescriptions[status] || "Order status updated";
   }
 }
