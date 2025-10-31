@@ -1,4 +1,4 @@
-import Stripe from "stripe";
+ import Stripe from "stripe";
 import { PrismaClient } from "@prisma/client";
 import { EmailService } from "./EmailService";
 
@@ -316,6 +316,18 @@ export class PaymentService {
                 email: true,
                 firstName: true,
                 lastName: true,
+              },
+            },
+            items: {
+              include: {
+                product: {
+                  select: {
+                    id: true,
+                    name: true,
+                    priceCents: true,
+                    imageUrl: true,
+                  },
+                },
               },
             },
           },

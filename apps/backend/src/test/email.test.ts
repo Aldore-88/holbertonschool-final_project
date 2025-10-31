@@ -131,6 +131,7 @@ describe('EmailService Tests', () => {
         id: 'order-123',
         orderNumber: 'FLR202501010001',
         totalCents: 2999,
+        subtotalCents: 2500,
         createdAt: new Date(),
         guestEmail: null,
         shippingFirstName: 'John',
@@ -156,7 +157,7 @@ describe('EmailService Tests', () => {
         from: '"Flora Marketplace" <test@flora.com>',
         to: 'user@example.com',
         subject: 'Order Confirmation #FLR202501010001',
-        html: expect.stringContaining('Dear John'),
+        html: expect.stringContaining('John Doe, thank you for your order!'),
       });
 
       const sentEmail = mockTransporter.sendMail.mock.calls[0][0];
@@ -172,6 +173,7 @@ describe('EmailService Tests', () => {
         id: 'order-123',
         orderNumber: 'FLR202501010001',
         totalCents: 2999,
+        subtotalCents: 2500,
         createdAt: new Date(),
         guestEmail: 'guest@example.com',
         shippingFirstName: 'Jane',
@@ -192,7 +194,7 @@ describe('EmailService Tests', () => {
         from: '"Flora Marketplace" <test@flora.com>',
         to: 'guest@example.com',
         subject: 'Order Confirmation #FLR202501010001',
-        html: expect.stringContaining('Dear Customer'),
+        html: expect.stringContaining('Jane Smith, thank you for your order!'),
       });
 
       const sentEmail = mockTransporter.sendMail.mock.calls[0][0];
@@ -291,7 +293,7 @@ describe('EmailService Tests', () => {
         from: '"Flora Marketplace" <test@flora.com>',
         to: 'guest@example.com',
         subject: 'Your Flora Order #FLR202501010001 Has Shipped!',
-        html: expect.stringContaining('Dear Customer'),
+        html: expect.stringContaining('Dear John Doe'),
       });
 
       const sentEmail = mockTransporter.sendMail.mock.calls[0][0];
