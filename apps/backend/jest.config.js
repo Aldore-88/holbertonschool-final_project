@@ -28,4 +28,7 @@ module.exports = {
   restoreMocks: true,
   // Prevent worker timeout warnings from Jest's internal timing
   workerIdleMemoryLimit: '512MB',
+  // Optimize for Docker environment
+  maxWorkers: 1, // Sequential execution for Docker, prevents worker overhead
+  forceExit: true, // Ensure clean exit after tests complete
 };

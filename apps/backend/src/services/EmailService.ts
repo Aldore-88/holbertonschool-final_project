@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
 import { User, Order, Subscription } from "@prisma/client";
 
-// Type for order with optional user info
+// Type for order with optional user info and items
 type OrderWithUser = Order & {
   user?: {
     id: string;
@@ -9,6 +9,19 @@ type OrderWithUser = Order & {
     firstName: string | null;
     lastName: string | null;
   } | null;
+  items?: Array<{
+    id: string;
+    quantity: number;
+    priceCents: number;
+    subscriptionType: string | null;
+    requestedDeliveryDate: Date | null;
+    product: {
+      id: string;
+      name: string;
+      priceCents: number;
+      imageUrl: string | null;
+    };
+  }>;
 };
 
 interface EmailConfig {
@@ -55,6 +68,29 @@ export class EmailService {
     return `"Flora Marketplace" <${senderEmail}>`;
   }
 
+  // Helper method to get customer name from order
+  private getCustomerName(order: OrderWithUser): string {
+    if (order.user?.firstName && order.user?.lastName) {
+      return `${order.user.firstName} ${order.user.lastName}`;
+    }
+    if (order.billingFirstName && order.billingLastName) {
+      return `${order.billingFirstName} ${order.billingLastName}`;
+    }
+    if (order.shippingFirstName && order.shippingLastName) {
+      return `${order.shippingFirstName} ${order.shippingLastName}`;
+    }
+    return order.user?.firstName || 'Valued Customer';
+  }
+
+  // Helper method to format dates consistently
+  private formatDate(date: Date): string {
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  }
+
   async sendWelcomeEmail(user: User): Promise<void> {
     const personalization = this.getPersonalization(user);
 
@@ -97,9 +133,10 @@ export class EmailService {
 
   async sendOrderConfirmation(order: OrderWithUser): Promise<void> {
     const customerEmail = order.guestEmail || order.user?.email;
-    const customerName = order.user?.firstName || 'Customer';
+    const customerName = this.getCustomerName(order);
+    const subtotalAmount = (order.subtotalCents / 100).toFixed(2);
+    const shippingAmount = ((order.totalCents - order.subtotalCents) / 100).toFixed(2);
     const totalAmount = (order.totalCents / 100).toFixed(2);
-    const deliveryAddress = `${order.shippingFirstName} ${order.shippingLastName}\n${order.shippingStreet1}${order.shippingStreet2 ? '\n' + order.shippingStreet2 : ''}\n${order.shippingCity}, ${order.shippingState} ${order.shippingZipCode}`;
 
     if (!customerEmail) {
       console.warn('No email found for order confirmation:', order.id);
@@ -111,30 +148,99 @@ export class EmailService {
       to: customerEmail,
       subject: `Order Confirmation #${order.orderNumber}`,
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <img src=''
-          <h1 style="color: #595E4E;">Order Confirmation</h1>
-          <p>Dear ${customerName},</p>
-          <p>Thank you for your order! We've received your purchase and are preparing it for delivery.</p>
-
-          <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="color: #595E4E; margin-top: 0;">Order Details</h3>
-            <p><strong>Order Number:</strong> #${order.orderNumber}</p>
-            <p><strong>Order Date:</strong> ${order.createdAt.toLocaleDateString()}</p>
-            <p><strong>Total Amount:</strong> $${totalAmount}</p>
-            <p><strong>Delivery Address:</strong><br/>
-            ${deliveryAddress}</p>
-            ${
-              order.requestedDeliveryDate
-                ? `<p><strong>Requested Delivery Date:</strong> ${new Date(order.requestedDeliveryDate).toLocaleDateString()}</p>`
-                : ""
-            }
-            ${order.deliveryNotes ? `<p><strong>Delivery Notes:</strong> ${order.deliveryNotes}</p>` : ""}
+        <div style="font-family: 'Outfit', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff;">
+          <!-- Logo Section -->
+          <div style="text-align: center; padding: 2rem 0;">
+            <div style="font-size: 1.5rem; font-weight: 600; color: #5a5a4a; letter-spacing: 2px;">FLORA</div>
           </div>
 
-          <p>We'll send you another email when your order ships with tracking information.</p>
-          <p>Thank you for choosing Flora!</p>
-          <p>The Flora Team</p>
+          <!-- Header Section -->
+          <div style="background: #C8D7C4; width: 100%; padding: 2rem; text-align: center; margin-bottom: 2rem;">
+            <h1 style="color: #595E4E; font-size: 36px; font-weight: 600; font-family: 'EB Garamond', Georgia, serif; margin: 0 0 1rem 0; letter-spacing: 2px;">ORDER CONFIRMATION</h1>
+
+            <!-- Order Number Highlight -->
+            <div style="background: rgba(255, 255, 255, 0.7); padding: 0.75rem 1.5rem; border-radius: 8px; margin: 1rem auto; display: inline-block; border: 2px solid #595E4E;">
+              <span style="color: #595E4E; font-size: 0.95rem; font-weight: 500;">Order Number:</span>
+              <span style="color: #595E4E; font-size: 1.125rem; font-family: 'EB Garamond', Georgia, serif; font-weight: 600; letter-spacing: 1px;"> #${order.orderNumber}</span>
+            </div>
+
+            <p style="color: #595E4E; font-size: 1.125rem; margin: 1rem 0;">${customerName}, thank you for your order!</p>
+            <p style="color: #595E4E; font-size: 0.95rem; line-height: 1.6; margin: 0.5rem auto; max-width: 500px;">We've received your order and will contact you as soon as your package is shipped. You can find your purchase information below.</p>
+          </div>
+
+          <!-- Order Summary Section -->
+          <div style="padding: 2rem; text-align: center;">
+            <h2 style="color: #595E4E; font-size: 36px; font-weight: 600; font-family: 'EB Garamond', Georgia, serif; margin-bottom: 0.5rem;">Order Summary</h2>
+            <p style="color: #595E4E; font-size: 16px; margin-bottom: 2rem;">${this.formatDate(order.createdAt)}</p>
+
+            <!-- Order Items -->
+            ${this.renderOrderItems(order)}
+
+            <!-- Price Breakdown -->
+            <table style="max-width: 400px; width: 100%; margin: 2rem auto; padding-top: 1.5rem; border-top: 1px solid #e5e5e0; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 0.35rem 0; color: #595E4E; font-size: 1rem; text-align: left;">Subtotal</td>
+                <td style="padding: 0.35rem 0; color: #595E4E; font-size: 1rem; text-align: right;">$${subtotalAmount}</td>
+              </tr>
+              <tr>
+                <td style="padding: 0.35rem 0; color: #595E4E; font-size: 1rem; text-align: left;">Shipping</td>
+                <td style="padding: 0.35rem 0; color: #595E4E; font-size: 1rem; text-align: right;">$${shippingAmount}</td>
+              </tr>
+              <tr>
+                <td colspan="2" style="padding-top: 0.5rem; border-top: 1px solid #e5e5e0;"></td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem 0; color: #595E4E; font-size: 1.125rem; font-weight: 700; text-align: left;">Total</td>
+                <td style="padding: 0.5rem 0; color: #595E4E; font-size: 1.125rem; font-weight: 700; text-align: right;">$${totalAmount}</td>
+              </tr>
+            </table>
+          </div>
+
+          <!-- Billing and Shipping Section -->
+          <div style="padding: 2rem; text-align: center;">
+            <h2 style="color: #595E4E; font-size: 36px; font-family: 'EB Garamond', Georgia, serif; font-weight: 600; margin-bottom: 2rem;">Billing and Shipping</h2>
+
+            <table style="width: 100%; max-width: 500px; margin: 0 auto; border-collapse: collapse;">
+              <tr>
+                <td style="width: 50%; vertical-align: top; padding: 1rem; text-align: left;">
+                  <h3 style="color: #595E4E; font-size: 20px; font-weight: 500; font-family: 'EB Garamond', Georgia, serif; margin: 0 0 1rem 0; white-space: nowrap;">Billing Information</h3>
+                  <p style="color: #595E4E; font-size: 15px; margin: 0.25rem 0; line-height: 1.6;">
+                    ${order.billingFirstName && order.billingLastName
+                      ? `${order.billingFirstName} ${order.billingLastName}<br/>${order.billingStreet1}<br/>${order.billingStreet2 ? order.billingStreet2 + '<br/>' : ''}${order.billingCity}, ${order.billingState}<br/>${order.billingZipCode}<br/>${order.billingCountry || 'AU'}`
+                      : `${order.shippingFirstName} ${order.shippingLastName}<br/>${order.shippingStreet1}<br/>${order.shippingStreet2 ? order.shippingStreet2 + '<br/>' : ''}${order.shippingCity}, ${order.shippingState}<br/>${order.shippingZipCode}<br/>${order.shippingCountry || 'AU'}<br/><span style="color: #6b7a5e; font-style: italic;">(Same as shipping)</span>`}
+                  </p>
+                </td>
+                <td style="width: 50%; vertical-align: top; padding: 1rem; text-align: left;">
+                  <h3 style="color: #595E4E; font-size: 20px; font-weight: 500; font-family: 'EB Garamond', Georgia, serif; margin: 0 0 1rem 0; white-space: nowrap;">Shipping Information</h3>
+                  <p style="color: #595E4E; font-size: 15px; margin: 0.25rem 0; line-height: 1.6;">
+                    ${order.shippingFirstName} ${order.shippingLastName}<br/>
+                    ${order.shippingStreet1}<br/>
+                    ${order.shippingStreet2 ? order.shippingStreet2 + '<br/>' : ''}
+                    ${order.shippingCity}, ${order.shippingState}<br/>
+                    ${order.shippingZipCode}<br/>
+                    ${order.shippingCountry || 'AU'}
+                  </p>
+                </td>
+              </tr>
+            </table>
+
+            <div style="margin-top: 2rem;">
+              <p style="color: #595E4E; font-size: 0.95rem; line-height: 1.6;">
+                ${order.requestedDeliveryDate
+                  ? `<strong>Requested Delivery Date:</strong> ${this.formatDate(new Date(order.requestedDeliveryDate))}<br/>`
+                  : ''}
+                ${order.deliveryNotes ? `<strong>Delivery Notes:</strong> ${order.deliveryNotes}<br/>` : ''}
+                <strong>Shipping method:</strong> ${order.deliveryType === 'STANDARD' ? 'Standard shipping' : order.deliveryType || 'Standard shipping'}
+              </p>
+            </div>
+          </div>
+
+          <!-- Footer Message -->
+          <div style="padding: 2rem; text-align: center; background: #C8D7C4;">
+            <p style="color: #595E4E; font-size: 0.95rem; line-height: 1.6; margin: 0 0 1rem 0;">We'll send you another email when your order ships with tracking information.</p>
+            <p style="color: #595E4E; font-size: 0.95rem; margin: 0;">Thank you for choosing Flora!</p>
+            <p style="color: #595E4E; font-size: 0.95rem; font-weight: 500; margin: 0.5rem 0 0 0;">The Flora Team</p>
+          </div>
         </div>
       `,
     };
@@ -144,7 +250,7 @@ export class EmailService {
 
   async sendOrderShipped(order: OrderWithUser, trackingNumber?: string): Promise<void> {
     const customerEmail = order.guestEmail || order.user?.email;
-    const customerName = order.user?.firstName || 'Customer';
+    const customerName = this.getCustomerName(order);
     const deliveryAddress = `${order.shippingFirstName} ${order.shippingLastName}\n${order.shippingStreet1}${order.shippingStreet2 ? '\n' + order.shippingStreet2 : ''}\n${order.shippingCity}, ${order.shippingState} ${order.shippingZipCode}`;
 
     if (!customerEmail) {
@@ -323,6 +429,75 @@ export class EmailService {
     await this.transporter.sendMail(confirmationOptions);
   }
 
+  // Helper method to render order items for email
+  private renderOrderItems(order: OrderWithUser): string {
+    if (!order.items || order.items.length === 0) {
+      return '';
+    }
+
+    return order.items.map(item => {
+      const itemTotal = ((item.priceCents * item.quantity) / 100).toFixed(2);
+      const subscriptionText = this.formatSubscriptionType(item.subscriptionType);
+      const deliveryDateText = item.requestedDeliveryDate
+        ? this.formatDate(new Date(item.requestedDeliveryDate))
+        : 'Standard delivery (3-5 business days)';
+
+      return `
+        <table style="background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05); max-width: 500px; width: 100%; margin-left: auto; margin-right: auto; border-collapse: collapse;">
+          <tr>
+            <td style="padding-bottom: 1rem; border-bottom: 1px solid #e5e5e0;">
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                  <td style="color: #595E4E; font-size: 1.25rem; font-family: 'EB Garamond', Georgia, serif; font-weight: 500; text-align: left;">${item.product.name}</td>
+                  <td style="color: #595E4E; font-size: 1.25rem; font-family: 'EB Garamond', Georgia, serif; font-weight: 500; text-align: right; white-space: nowrap;">$${itemTotal}</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="color: #595E4E; font-size: 0.95rem; font-family: 'Outfit', Arial, sans-serif; line-height: 1.8; padding-top: 1rem; text-align: left;">
+              <p style="margin: 0.25rem 0;"><strong>Quantity:</strong> ${item.quantity}</p>
+              <p style="margin: 0.25rem 0;"><strong>Suburb:</strong> ${order.shippingCity || 'N/A'}</p>
+              <p style="margin: 0.25rem 0;"><strong>Postcode:</strong> ${order.shippingZipCode || 'N/A'}</p>
+              <p style="margin: 0.25rem 0;"><strong>Delivery Date:</strong> ${deliveryDateText}</p>
+              <p style="margin: 0.25rem 0;"><strong>Subscription:</strong> ${subscriptionText}</p>
+            </td>
+          </tr>
+        </table>
+      `;
+    }).join('');
+  }
+
+  // Helper method to format subscription type
+  private formatSubscriptionType(subscriptionType?: string | null): string {
+    if (!subscriptionType) return 'One-time purchase';
+
+    let frequency = '';
+    let type = '';
+
+    if (subscriptionType.includes('SPONTANEOUS')) {
+      type = 'Spontaneous';
+    } else if (subscriptionType.includes('RECURRING')) {
+      type = 'Recurring';
+    }
+
+    if (subscriptionType.includes('BIWEEKLY')) {
+      frequency = 'Biweekly';
+    } else if (subscriptionType.includes('WEEKLY')) {
+      frequency = 'Weekly';
+    } else if (subscriptionType.includes('MONTHLY')) {
+      frequency = 'Monthly';
+    } else if (subscriptionType.includes('QUARTERLY')) {
+      frequency = 'Quarterly';
+    } else if (subscriptionType.includes('YEARLY')) {
+      frequency = 'Yearly';
+    } else if (subscriptionType === 'SPONTANEOUS') {
+      return 'Biweekly Spontaneous';
+    }
+
+    return frequency && type ? `${frequency} ${type}` : subscriptionType;
+  }
+
   // Helper method to create personalized content based on user preferences
   private getPersonalization(user: User): string | null {
     const preferences = [];
@@ -342,22 +517,4 @@ export class EmailService {
     return preferences.length > 0 ? preferences.join(' ') + '.' : null;
   }
 
-  // Helper method to determine appropriate greeting based on user context
-  private getGreeting(user?: User, guestEmail?: string | null): string {
-    if (user && user.firstName) {
-      return `Dear ${user.firstName}`;
-    } else if (user) {
-      return `Dear Valued Customer`;
-    } else if (guestEmail) {
-      return `Dear Customer`;
-    }
-    return `Hello`;
-  }
-
-  // Check if user has opted out of marketing emails (placeholder for future implementation)
-  private async shouldSendMarketingEmail(user: User): Promise<boolean> {
-    // In the future, check user preferences for marketing emails
-    // For now, default to true
-    return true;
-  }
 }
