@@ -11,8 +11,13 @@ output "frontend_s3_bucket" {
 }
 
 output "backend_api_url" {
-  description = "Elastic Beanstalk application URL"
+  description = "Elastic Beanstalk application URL (HTTP only)"
   value       = module.elastic_beanstalk.application_url
+}
+
+output "backend_cloudfront_url" {
+  description = "Backend CloudFront URL (HTTPS - use this for Stripe webhooks)"
+  value       = module.elastic_beanstalk.cloudfront_url
 }
 
 output "backend_environment_name" {
@@ -50,8 +55,11 @@ output "deployment_summary" {
       S3 Bucket:      ${module.s3_cloudfront.s3_bucket_name}
 
     Backend:
-      API URL:        ${module.elastic_beanstalk.application_url}
-      Environment:    ${module.elastic_beanstalk.environment_name}
+      API URL (HTTP):  ${module.elastic_beanstalk.application_url}
+      HTTPS URL:       ${module.elastic_beanstalk.cloudfront_url}
+      Environment:     ${module.elastic_beanstalk.environment_name}
+
+      ⚠️  Use HTTPS URL for Stripe webhooks
 
     Database:
       Endpoint:       ${module.rds.db_endpoint}

@@ -63,6 +63,23 @@ aws configure
 # Default output format: json
 ```
 
+**Note:**: Check if AWS CLI is Already Configured
+
+  AWS CLI configuration is stored globally on your machine (not per-project). If you configured it before for another
+  project, it's likely still there!
+
+```
+  # Check if AWS CLI is installed and configured
+  aws --version
+
+  # Check current AWS configuration
+  aws configure list
+
+  # Verify your credentials work (this will show your AWS account info)
+  aws sts get-caller-identity
+```
+
+
 ## 🚀 Deployment Steps
 
 ### Step 1: Configure Terraform Variables
@@ -80,8 +97,16 @@ nano terraform.tfvars
 - `stripe_secret_key` - From Stripe dashboard
 - `stripe_publishable_key` - From Stripe dashboard
 
-### Step 2: Initialize Terraform
+### Step 2: Initialize Terraform (download AWS provider)
 
+Quick test before initializing:
+```bash
+  # Validate syntax
+  terraform validate
+  # Expected: "Success! The configuration is valid."
+```
+
+Then:
 ```bash
 terraform init
 ```
@@ -91,10 +116,11 @@ This will:
 - Initialize backend configuration
 - Prepare modules
 
-### Step 3: Plan Infrastructure
+### Step 3: Plan Infrastructure - Preview what will be created (IMPORTANT!)
 
 ```bash
 terraform plan
+# Expected: "Plan: ~20 to add, 0 to change, 0 to destroy."
 ```
 
 Review the plan to see what resources will be created:
@@ -103,6 +129,24 @@ Review the plan to see what resources will be created:
 - Elastic Beanstalk application & environment
 - S3 bucket for frontend
 - CloudFront distribution
+
+**Note**: In some cases which we don't apply rightaway, like:
+
+  1. CI/CD pipelines - Plan and apply happen at different times
+  2. Team approval workflows - Need to review plan before applying
+  3. Multi-day deployments - Plan today, apply tomorrow
+
+Then, we can save the plan to a file so you can apply that exact plan later:
+```bash
+  # Save plan to file
+  terraform plan -out=tfplan
+
+  # Review the saved plan
+  terraform show tfplan
+
+  # Apply the saved plan (no confirmation needed)
+  terraform apply tfplan
+```
 
 ### Step 4: Deploy Infrastructure
 

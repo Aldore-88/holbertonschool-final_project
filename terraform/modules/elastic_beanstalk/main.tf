@@ -105,7 +105,7 @@ resource "aws_elastic_beanstalk_application" "backend" {
 resource "aws_elastic_beanstalk_environment" "backend" {
   name                = "${var.project_name}-backend-${var.environment}"
   application         = aws_elastic_beanstalk_application.backend.name
-  solution_stack_name = "64bit Amazon Linux 2023 v4.3.5 running Docker"
+  solution_stack_name = "64bit Amazon Linux 2023 v4.7.3 running Docker"
   tier                = "WebServer"
 
   # VPC Configuration
@@ -121,6 +121,13 @@ resource "aws_elastic_beanstalk_environment" "backend" {
     value     = join(",", var.public_subnet_ids)
   }
 
+  # Attach the load balancer to the same public subnets
+  setting {
+    namespace = "aws:ec2:vpc"
+    name      = "ELBSubnets"
+    value     = join(",", var.public_subnet_ids)
+  }
+
   setting {
     namespace = "aws:ec2:vpc"
     name      = "AssociatePublicIpAddress"
@@ -131,7 +138,7 @@ resource "aws_elastic_beanstalk_environment" "backend" {
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
     name      = "InstanceType"
-    value     = "t2.micro" # Free tier eligible
+    value     = "t3.micro" # Free tier eligible (newer regions prefer t3.micro)
   }
 
   setting {
@@ -166,25 +173,18 @@ resource "aws_elastic_beanstalk_environment" "backend" {
     value     = aws_iam_role.eb_service_role.name
   }
 
-  # Load Balancer (use Application Load Balancer)
-  setting {
-    namespace = "aws:elasticbeanstalk:environment"
-    name      = "LoadBalancerType"
-    value     = "application"
-  }
-
-  # Health Reporting
-  setting {
-    namespace = "aws:elasticbeanstalk:healthreporting:system"
-    name      = "SystemType"
-    value     = "enhanced"
-  }
-
-  # Environment Type
+  # Environment Type - Load balanced (required for ALB + CloudFront)
   setting {
     namespace = "aws:elasticbeanstalk:environment"
     name      = "EnvironmentType"
     value     = "LoadBalanced"
+  }
+
+  # Health Reporting - Basic (enhanced requires load balancer)
+  setting {
+    namespace = "aws:elasticbeanstalk:healthreporting:system"
+    name      = "SystemType"
+    value     = "basic"
   }
 
   # Platform Configuration for Docker
@@ -209,5 +209,85 @@ resource "aws_elastic_beanstalk_environment" "backend" {
     namespace = "aws:elasticbeanstalk:application:environment"
     name      = "PORT"
     value     = "3001"
+  }
+}
+
+# CloudFront Distribution for Backend (HTTPS Support)
+# This provides free HTTPS via CloudFront's certificate for Stripe webhooks
+resource "aws_cloudfront_distribution" "backend" {
+  enabled         = true
+  is_ipv6_enabled = true
+  comment         = "Flora Marketplace Backend API - HTTPS for Stripe"
+  price_class     = "PriceClass_100" # Use only North America & Europe (cheapest)
+
+  # Use the Elastic Beanstalk load balancer as origin
+  origin {
+    domain_name = aws_elastic_beanstalk_environment.backend.cname
+    origin_id   = "ELB-${aws_elastic_beanstalk_environment.backend.name}"
+
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "http-only" # ELB doesn't have SSL yet
+      origin_ssl_protocols   = ["TLSv1.2"]
+    }
+  }
+
+  default_cache_behavior {
+    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods   = ["GET", "HEAD", "OPTIONS"]
+    target_origin_id = "ELB-${aws_elastic_beanstalk_environment.backend.name}"
+
+    forwarded_values {
+      query_string = true
+      headers      = ["Authorization", "Accept", "Content-Type", "Origin"]
+
+      cookies {
+        forward = "all"
+      }
+    }
+
+    viewer_protocol_policy = "redirect-to-https" # Force HTTPS for Stripe
+    min_ttl                = 0
+    default_ttl            = 0    # Don't cache API responses by default
+    max_ttl                = 0
+    compress               = true
+  }
+
+  # Don't cache POST requests (for Stripe webhooks)
+  ordered_cache_behavior {
+    path_pattern     = "/api/webhooks/*"
+    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods   = ["GET", "HEAD", "OPTIONS"]
+    target_origin_id = "ELB-${aws_elastic_beanstalk_environment.backend.name}"
+
+    forwarded_values {
+      query_string = true
+      headers      = ["*"] # Forward all headers for webhooks
+
+      cookies {
+        forward = "all"
+      }
+    }
+
+    viewer_protocol_policy = "https-only" # Stripe webhooks must be HTTPS
+    min_ttl                = 0
+    default_ttl            = 0
+    max_ttl                = 0
+  }
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+    }
+  }
+
+  viewer_certificate {
+    cloudfront_default_certificate = true
+    minimum_protocol_version       = "TLSv1.2_2021"
+  }
+
+  tags = {
+    Name = "${var.project_name}-backend-cdn"
   }
 }

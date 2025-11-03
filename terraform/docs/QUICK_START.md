@@ -13,23 +13,6 @@
 | `DOCKER_COMMANDS_EXPLAINED.md` | Local vs AWS Docker commands | Troubleshooting |
 | `README.md` | Full reference documentation | Looking up specific tasks |
 
-## ⚡ TL;DR - Deploy in 15 Minutes
-
-```bash
-# 1. Setup (5 min)
-cd terraform
-cp terraform.tfvars.example terraform.tfvars
-nano terraform.tfvars  # Fill in secrets
-
-# 2. Create infrastructure (10 min)
-terraform init
-terraform apply  # Type 'yes'
-
-# 3. Deploy code (covered in next sections)
-# Backend: ./scripts/deploy-backend.sh
-# Frontend: ./scripts/deploy-frontend.sh
-```
-
 ## 📋 Prerequisites
 
 ### Required Tools
@@ -68,10 +51,10 @@ cd terraform
 cp terraform.tfvars.example terraform.tfvars
 ```
 
-Edit `terraform.tfvars`:
+Edit `terraform.tfvars` with secrets
 
 ```hcl
-# Database
+# Database - set it yourself
 database_username = "flora_admin"
 database_password = "ChangeMe_SecurePassword123!"  # Strong password!
 
@@ -82,10 +65,6 @@ auth0_client_secret = "YOUR_SECRET_FROM_AUTH0_DASHBOARD"
 stripe_secret_key = "sk_test_YOUR_KEY_HERE"
 stripe_publishable_key = "pk_test_YOUR_KEY_HERE"
 ```
-
-**Where to find secrets:**
-- Auth0: https://manage.auth0.com → Applications → Flora → Settings
-- Stripe: https://dashboard.stripe.com/test/apikeys
 
 ### Step 2: Create AWS Infrastructure
 
@@ -110,7 +89,7 @@ Creating infrastructure...
 ✅ Elastic Beanstalk environment (4 minutes)
 ✅ S3 bucket + CloudFront (1 minute)
 
-Total: ~10 minutes
+Total: ~10 - 15 minutes
 ```
 
 **Save the outputs:**

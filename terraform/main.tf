@@ -149,13 +149,20 @@ module "elastic_beanstalk" {
 
   # Environment variables for backend
   env_vars = {
-    DATABASE_URL               = module.rds.connection_string
-    AUTH0_DOMAIN              = var.auth0_domain
-    AUTH0_CLIENT_ID           = var.auth0_client_id
-    AUTH0_CLIENT_SECRET       = var.auth0_client_secret
-    AUTH0_AUDIENCE            = var.auth0_audience
-    STRIPE_SECRET_KEY         = var.stripe_secret_key
-    NODE_ENV                  = "production"
+    DATABASE_URL          = module.rds.connection_string
+    AUTH0_DOMAIN          = var.auth0_domain
+    AUTH0_CLIENT_ID       = var.auth0_client_id
+    AUTH0_CLIENT_SECRET   = var.auth0_client_secret
+    AUTH0_AUDIENCE        = var.auth0_audience
+    STRIPE_SECRET_KEY     = var.stripe_secret_key
+    STRIPE_WEBHOOK_SECRET = var.stripe_webhook_secret
+    GEMINI_API_KEY        = var.gemini_api_key
+    SMTP_HOST             = var.smtp_host
+    SMTP_PORT             = var.smtp_port
+    SMTP_SECURE           = var.smtp_secure
+    SMTP_USER             = var.smtp_user
+    SMTP_PASS             = var.smtp_pass
+    NODE_ENV              = "production"
   }
 }
 

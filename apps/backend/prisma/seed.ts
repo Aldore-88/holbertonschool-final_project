@@ -335,71 +335,6 @@ const collections = [
   },
 ];
 
-// Test users for graduation project demo
-// Note: These users have Auth0 IDs that match real test accounts
-const testUsers = [
-  {
-    id: 'user_1_test', // Will be replaced with real Auth0 ID when testing
-    email: 'test@flora.com',
-    firstName: 'Flora',
-    lastName: 'Tester',
-    role: 'CUSTOMER',
-  },
-  {
-    id: 'user_2_demo', // For demo purposes
-    email: 'demo@flora.com',
-    firstName: 'Demo',
-    lastName: 'User',
-    role: 'CUSTOMER',
-  }
-];
-
-// Test addresses for our test users (Melbourne, Australia)
-const testAddresses = [
-  // Addresses for test@flora.com
-  {
-    userId: 'user_1_test',
-    label: 'Home',
-    firstName: 'Flora',
-    lastName: 'Tester',
-    street1: '123 Collins Street',
-    street2: 'Apt 15B',
-    city: 'Melbourne',
-    state: 'VIC',
-    zipCode: '3000',
-    country: 'AU',
-    phone: '+61-3-9555-0123',
-    isDefault: true,
-  },
-  {
-    userId: 'user_1_test',
-    label: 'Work',
-    firstName: 'Flora',
-    lastName: 'Tester',
-    street1: '456 Bourke Street',
-    city: 'Melbourne',
-    state: 'VIC',
-    zipCode: '3000',
-    country: 'AU',
-    phone: '+61-3-9555-0123',
-    isDefault: false,
-  },
-  // Address for demo@flora.com
-  {
-    userId: 'user_2_demo',
-    label: 'Home',
-    firstName: 'Demo',
-    lastName: 'User',
-    street1: '789 Chapel Street',
-    city: 'South Yarra',
-    state: 'VIC',
-    zipCode: '3141',
-    country: 'AU',
-    phone: '+61-3-9555-0456',
-    isDefault: true,
-  },
-];
-
 async function main() {
   console.log('🌸 Starting to seed Flora database...');
   console.log('🔄 Using UPSERT pattern - updates existing data, creates new data');
@@ -439,52 +374,19 @@ async function main() {
     }
   }
 
-  // Upsert test users (using email as unique identifier)
-  console.log('👤 Upserting test users...');
-  for (const user of testUsers) {
-    await prisma.user.upsert({
-      where: { email: user.email },
-      update: {
-        firstName: user.firstName,
-        lastName: user.lastName,
-        role: user.role,
-      },
-      create: user,
-    });
-  }
-
-  // Upsert test addresses (find by userId + label combination)
-  console.log('🏠 Upserting test addresses...');
-  for (const address of testAddresses) {
-    const existing = await prisma.address.findFirst({
-      where: {
-        userId: address.userId,
-        label: address.label,
-      },
-    });
-
-    if (existing) {
-      await prisma.address.update({
-        where: { id: existing.id },
-        data: address,
-      });
-    } else {
-      await prisma.address.create({
-        data: address,
-      });
-    }
-  }
+  // Test users and addresses removed for production deployment
+  // Users are created automatically via Auth0 authentication
+  // Addresses are created by users through the app UI
+  console.log('👤 Skipping test users - production uses Auth0 authentication');
+  console.log('🏠 Skipping test addresses - users will create their own');
 
   console.log('✅ Seeding completed successfully!');
   console.log(`📊 Created:`);
   console.log(`   ${categories.length} categories`);
   console.log(`   ${sampleProducts.length} products`);
-  console.log(`   ${testUsers.length} test users`);
-  console.log(`   ${testAddresses.length} test addresses`);
-  console.log(`\n🧪 Test Data Ready:`);
-  console.log(`   📧 Test User: test@flora.com`);
-  console.log(`   📧 Demo User: demo@flora.com`);
-  console.log(`   🏠 Addresses: ${testAddresses.length} total (default addresses marked)`);
+  console.log(`\n🎉 Production database ready!`);
+  console.log(`   Users will be created via Auth0 authentication`);
+  console.log(`   Products are ready for browsing and purchase`);
 }
 
 main()
