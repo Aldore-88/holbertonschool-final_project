@@ -87,63 +87,56 @@ h6 {
 
 
 h1 {
-    font-family: var(--primary-font-web-copy);
-    letter-spacing: 0.1em;
-    font-size: 128px;
-    font-weight: normal;
+  font-family: var(--primary-font-web-copy);
+  letter-spacing: 0.1em;
+  font-size: 128px;
+  font-weight: normal;
 }
 
 h2 {
-    font-family: var(--primary-font-web-copy);
-    font-size: 64px;
-    font-weight:bold;
+  font-family: var(--primary-font-web-copy);
+  font-size: 64px;
+  font-weight: bold;
 }
 
 h3 {
-    font-family: var(--primary-font-web-copy);
-    font-size: 20px;
-    font-weight: bold;
+  font-family: var(--primary-font-web-copy);
+  font-size: 20px;
+  font-weight: bold;
 }
 
 h4 {
-    font-family: var(--primary-font-web-copy);
-    font-size: 16px;
-    font-weight: bold;
+  font-family: var(--primary-font-web-copy);
+  font-size: 16px;
+  font-weight: bold;
 }
 
 h5 {
-    font-size: 20px;
-    font-weight: normal; 
+  font-size: 20px;
+  font-weight: normal;
 }
 
 h6 {
-    font-size: 16px;
-    font-weight: normal;
+  font-size: 16px;
+  font-weight: normal;
 }
 
-a {
-    text-decoration: underline;
-    color: var(--text-colour);
-    font-family: var(--primary-font-web-copy);
-    font-size: 20px;
-    font-weight: bold;
-    display: flex;
+.flora-logo-mark {
+  height: 72px;
+  width: auto;
 }
 
-.top-nav-bar button{
-    text-decoration: underline;
-    color: var(--text-colour);
-    font-family: var(--primary-font-web-copy);
-    font-size: 20px;
-    font-weight: bold;
-    display: flex;
-    border: none;
-    cursor: pointer;
+.flora-logo-wordmark {
+  height: 72px;
+  width: auto;
 }
 
-a img{
-    width:30px;
-    height:30px;
+.flora-logo-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
 }
 
 ul {

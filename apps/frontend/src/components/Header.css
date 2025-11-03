@@ -14,6 +14,23 @@
   padding: 8px;
 }
 
+.logo-image img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+}
+
+.logo-image .flora-logo-mark {
+  height: 78px;
+  width: auto;
+}
+
+.logo-image .flora-logo-wordmark {
+  height: 78px;
+  width: auto;
+  margin-left: 12px;
+}
+
 .banner-image{
     width: 100%;
     height: 100px;
@@ -25,6 +42,20 @@
 }
 
 /*-----*/
+
+.banner-menu a {
+  text-decoration: underline;
+  color: var(--text-colour);
+  font-family: var(--primary-font-web-copy);
+  font-size: 20px;
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+}
+
+.banner-menu a:hover {
+  color: #3e4436;
+}
 
 .flora-header {
   width: 100%;

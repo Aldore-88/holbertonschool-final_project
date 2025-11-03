@@ -261,11 +261,17 @@ const Header: React.FC = () => {
         </div>
         <div className="banner-image">
           <div className="logo-image">
-          <a href="/">
-            <img src="/assets/flora-logo.svg" alt="flora logo" width="75px">
-            </img>
-            <img src="/assets/flora-text-cursive.svg" alt="flora text" width="150px">
-            </img>
+          <a href="/" className="flora-logo-link">
+            <img
+              src="/assets/flora-logo.svg"
+              alt="Flora logomark"
+              className="flora-logo-mark"
+            />
+            <img
+              src="/assets/flora-text-cursive.svg"
+              alt="Flora wordmark"
+              className="flora-logo-wordmark"
+            />
           </a>
           </div>
         </div>

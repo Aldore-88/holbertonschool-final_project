@@ -132,11 +132,17 @@ const CheckoutPage: React.FC = () => {
       <div className="checkout-container">
         <div className="checkout-left">
           <div className="checkout-logo-placeholder">
-            <a href="/">
-            <img src="/assets/flora-logo.svg" alt="flora logo" width="75px" height="150px">
-            </img>
-            <img src="/assets/flora-text-cursive.svg" alt="flora text" width="150px" height="150px">
-            </img>
+            <a href="/" className="flora-logo-link">
+              <img
+                src="/assets/flora-logo.svg"
+                alt="Flora logomark"
+                className="flora-logo-mark"
+              />
+              <img
+                src="/assets/flora-text-cursive.svg"
+                alt="Flora wordmark"
+                className="flora-logo-wordmark"
+              />
             </a>
           </div>
           {getErrorDisplay()}
