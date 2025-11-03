@@ -210,6 +210,18 @@ resource "aws_elastic_beanstalk_environment" "backend" {
     name      = "PORT"
     value     = "3001"
   }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "CORS_ALLOWED_ORIGINS"
+    value     = "https://d1fgjrmf4cfwou.cloudfront.net"
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "FRONTEND_URL"
+    value     = "https://d1fgjrmf4cfwou.cloudfront.net"
+  }
 }
 
 # CloudFront Distribution for Backend (HTTPS Support)
