@@ -26,6 +26,38 @@ This directory contains Terraform infrastructure as code (IaC) for deploying Flo
         └────────────────────┘
 ```
 
+## 🚀 Deployment Approach: CI/CD vs Manual
+
+This project supports **two deployment methods**:
+
+### ✅ Recommended: CI/CD with GitHub Actions (Automated)
+
+**Best for:** Daily development, team collaboration, production deployments
+
+- Push code to GitHub → Automatic deployment
+- Workflows defined in `.github/workflows/`
+- Backend: Build → DockerHub → Elastic Beanstalk
+- Frontend: Build → S3 → CloudFront invalidation
+
+**Setup:**
+1. Configure GitHub Secrets (10 total)
+2. Push to `li-dev` branch
+3. Monitor deployment in GitHub Actions tab
+
+**See:** [`QUICK_START.md`](./QUICK_START.md) for full CI/CD setup guide
+
+### 🔧 Manual Deployment (Fallback)
+
+**Best for:** Initial setup, troubleshooting, GitHub Actions downtime
+
+- Run deployment scripts or commands locally
+- Requires: AWS CLI, EB CLI, Docker
+- Manual `eb deploy` and `aws s3 sync` commands
+
+**See:** Instructions below in this README
+
+---
+
 ## 📋 Prerequisites
 
 1. **AWS Account** (with student/free tier access)
@@ -165,24 +197,73 @@ Type `yes` to confirm. This will take **10-15 minutes** to complete.
 
 ### Step 5: Deploy Backend to Elastic Beanstalk
 
-After Terraform completes, deploy your Docker backend:
+After Terraform completes, deploy your Docker backend.
+
+**⚠️ Note:** This is the **manual deployment method**. For automated CI/CD, see [`QUICK_START.md`](./QUICK_START.md).
+
+#### Option A: Deploy with DockerHub (Recommended for CI/CD)
 
 ```bash
-# Navigate to backend directory
 cd ../apps/backend
 
-# Initialize EB CLI (only first time)
-eb init -p docker -r ap-southeast-2 flora-backend
+# 1. Build and push to DockerHub
+docker build -t your-dockerhub-username/flora-backend:latest -f Dockerfile ../../
+docker push your-dockerhub-username/flora-backend:latest
 
-# Link to existing EB environment created by Terraform
-eb use flora-backend-production
-
-# Create Dockerrun.aws.json for single container
+# 2. Create Dockerrun.aws.json pointing to DockerHub image
 cat > Dockerrun.aws.json <<'EOF'
 {
   "AWSEBDockerrunVersion": "1",
   "Image": {
-    "Name": "flora-backend",
+    "Name": "your-dockerhub-username/flora-backend:latest",
+    "Update": "true"
+  },
+  "Ports": [
+    {
+      "ContainerPort": 3001,
+      "HostPort": 80
+    }
+  ],
+  "Logging": "/var/log/flora-backend"
+}
+EOF
+
+# 3. Create .ebignore to exclude Dockerfile
+cat > .ebignore <<'EOF'
+Dockerfile
+Dockerfile.*
+node_modules/
+src/
+*.test.ts
+coverage/
+.env*
+!.env.example
+dist/
+*.md
+.vscode/
+EOF
+
+# 4. Initialize EB CLI (only first time)
+eb init -p docker -r ap-southeast-2 flora-backend
+eb use flora-backend-production
+
+# 5. Deploy
+eb deploy
+```
+
+**Why .ebignore?** Prevents EB from trying to build locally from Dockerfile. EB should pull the pre-built image from DockerHub.
+
+#### Option B: Build on EB Instance (Local development)
+
+```bash
+cd ../apps/backend
+
+# Create Dockerrun.aws.json (build locally)
+cat > Dockerrun.aws.json <<'EOF'
+{
+  "AWSEBDockerrunVersion": "1",
+  "Image": {
+    "Name": ".",
     "Update": "true"
   },
   "Ports": [
@@ -194,19 +275,9 @@ cat > Dockerrun.aws.json <<'EOF'
 }
 EOF
 
-# Deploy backend
-eb deploy
-```
-
-**Alternative: Deploy with pre-built Docker image**
-
-```bash
-# Build and push to Docker Hub (or AWS ECR)
-docker build -t your-dockerhub-username/flora-backend:latest .
-docker push your-dockerhub-username/flora-backend:latest
-
-# Update Dockerrun.aws.json with your image
-# Then deploy
+# Initialize and deploy
+eb init -p docker -r ap-southeast-2 flora-backend
+eb use flora-backend-production
 eb deploy
 ```
 

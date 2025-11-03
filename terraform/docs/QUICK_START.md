@@ -2,16 +2,43 @@
 
 ## 📚 Documentation Overview
 
-**Start here** → Quick deployment guide
+**Start here** → Quick deployment guide with CI/CD
 **Deep dive** → See other docs for detailed explanations
 
 | Document | Purpose | When to Read |
 |----------|---------|--------------|
-| `QUICK_START.md` (this file) | Deploy to AWS step-by-step | First time setup |
+| `QUICK_START.md` (this file) | Deploy to AWS with CI/CD | First time setup |
 | `ARCHITECTURE.md` | How Terraform works, file connections | Understanding the system |
 | `DOCKER_DEPLOYMENT.md` | Docker strategy for AWS | Understanding build process |
 | `DOCKER_COMMANDS_EXPLAINED.md` | Local vs AWS Docker commands | Troubleshooting |
 | `README.md` | Full reference documentation | Looking up specific tasks |
+
+## 🎯 Deployment Strategy
+
+This guide sets up **automated CI/CD pipelines** using GitHub Actions:
+
+```
+┌──────────────────────────────────────────────────────┐
+│  Push to GitHub (li-dev branch)                      │
+│         ↓                                             │
+│  GitHub Actions Workflow Triggers                    │
+│         ↓                                             │
+│  ┌──────────────────┐    ┌──────────────────┐       │
+│  │ Backend Pipeline │    │ Frontend Pipeline│       │
+│  │ 1. Build Docker  │    │ 1. Build with    │       │
+│  │ 2. Push to       │    │    Docker        │       │
+│  │    DockerHub     │    │ 2. Upload to S3  │       │
+│  │ 3. EB pulls &    │    │ 3. Invalidate    │       │
+│  │    runs image    │    │    CloudFront    │       │
+│  └──────────────────┘    └──────────────────┘       │
+└──────────────────────────────────────────────────────┘
+```
+
+**Benefits:**
+- ✅ Push code → automatic deployment
+- ✅ Consistent builds every time
+- ✅ No manual build steps
+- ✅ Production-ready workflow
 
 ## 📋 Prerequisites
 
@@ -21,19 +48,23 @@
 # Check what you have
 aws --version        # Need: AWS CLI v2
 terraform --version  # Need: v1.0+
-eb --version         # Need: EB CLI
-docker --version     # Need: Docker
+git --version        # Need: Git
 
 # Install missing tools
 brew install awscli terraform
-pip install awsebcli
 ```
+
+### Required Accounts
+
+1. **AWS Account** - Use AWS Educate/Academy for free tier
+2. **GitHub Account** - For repository and Actions
+3. **DockerHub Account** - Free tier (for backend images)
+   - Sign up at https://hub.docker.com
 
 ### AWS Account Setup
 
-1. **Student Account:** Use AWS Educate/Academy for free tier
-2. **Access Keys:** IAM → Users → Create access key
-3. **Configure CLI:**
+1. **Access Keys:** IAM → Users → Create access key
+2. **Configure CLI:**
    ```bash
    aws configure
    # AWS Access Key ID: AKIA...
@@ -44,29 +75,53 @@ pip install awsebcli
 
 ## 🚀 Step-by-Step Deployment
 
-### Step 1: Configure Secrets
+### Step 1: Fork Repository (If Working on Personal Version)
+
+```bash
+# Fork the group repo on GitHub UI
+# Then clone your fork:
+git clone https://github.com/YOUR_USERNAME/holbertonschool-final_project_me.git
+cd holbertonschool-final_project_me
+```
+
+**Important:** You'll use **two repositories**:
+- **Original/Group Repo**: For running Terraform (infrastructure)
+- **Your Forked Repo**: For code deployment via GitHub Actions
+
+### Step 2: Configure Terraform Secrets
 
 ```bash
 cd terraform
 cp terraform.tfvars.example terraform.tfvars
 ```
 
-Edit `terraform.tfvars` with secrets
+Edit `terraform.tfvars` with your secrets:
 
 ```hcl
-# Database - set it yourself
+# Database - set strong password
 database_username = "flora_admin"
-database_password = "ChangeMe_SecurePassword123!"  # Strong password!
+database_password = "ChangeMe_SecurePassword123!"
 
-# Auth0 (from your .env files)
+# Auth0 (from backend .env file)
+auth0_domain = "dev-ijvur34mojpovh8e.us.auth0.com"
+auth0_client_id = "tegmEuc40IvXfYFDLIRnJmbsa1izkTVL"
 auth0_client_secret = "YOUR_SECRET_FROM_AUTH0_DASHBOARD"
+auth0_audience = "https://flora-api.com"
 
-# Stripe (from your .env files)
+# Stripe (from your dashboard)
 stripe_secret_key = "sk_test_YOUR_KEY_HERE"
+stripe_webhook_secret = "whsec_YOUR_WEBHOOK_SECRET"
 stripe_publishable_key = "pk_test_YOUR_KEY_HERE"
+
+# Email/SMTP (optional, from backend .env)
+smtp_user = "your_email@gmail.com"
+smtp_pass = "your_app_password"
+
+# Gemini AI (optional, from backend .env)
+gemini_api_key = "your_gemini_key"
 ```
 
-### Step 2: Create AWS Infrastructure
+### Step 3: Create AWS Infrastructure
 
 ```bash
 # Initialize Terraform (downloads AWS provider)
@@ -75,11 +130,11 @@ terraform init
 # Preview what will be created
 terraform plan
 
-# Create infrastructure (takes ~10 minutes)
+# Create infrastructure (takes ~10-15 minutes)
 terraform apply
 ```
 
-**Type `yes` when prompted.**
+Type `yes` when prompted.
 
 **What gets created:**
 ```
@@ -87,47 +142,67 @@ Creating infrastructure...
 ✅ VPC and networking (30 seconds)
 ✅ RDS PostgreSQL database (5 minutes)
 ✅ Elastic Beanstalk environment (4 minutes)
-✅ S3 bucket + CloudFront (1 minute)
+✅ S3 bucket + CloudFront (frontend) (1 minute)
+✅ CloudFront distribution (backend HTTPS) (2 minutes)
 
-Total: ~10 - 15 minutes
+Total: ~10-15 minutes
 ```
 
 **Save the outputs:**
 ```bash
-# After terraform apply completes
-terraform output
+terraform output > ../deployment-urls.txt
+cat ../deployment-urls.txt
 ```
 
 You'll see:
 ```
 backend_api_url = "http://flora-backend-production.xxx.elasticbeanstalk.com"
-frontend_cloudfront_url = "https://d1234abcd.cloudfront.net"
+backend_cloudfront_url = "https://d15olm8n2z7b5h.cloudfront.net"
+frontend_cloudfront_url = "https://d1fgjrmf4cfwou.cloudfront.net"
 frontend_s3_bucket = "flora-frontend-production-abc123"
+cloudfront_distribution_id = "E1V7RQIMT2CEP4"
 ```
 
-### Step 3: Deploy Backend
+### Step 4: Set Up GitHub Secrets (For CI/CD)
 
-**Option A: Using deployment script (recommended)**
+Go to your **forked repository** on GitHub:
+1. **Settings** → **Secrets and variables** → **Actions**
+2. Click **New repository secret**
 
-```bash
-./scripts/deploy-backend.sh
-```
+Add these secrets:
 
-**Option B: Manual deployment**
+**AWS Credentials (4 secrets):**
+- `AWS_ACCESS_KEY_ID` = Your AWS access key
+- `AWS_SECRET_ACCESS_KEY` = Your AWS secret key
+
+**DockerHub Credentials (2 secrets):**
+- `DOCKERHUB_USERNAME` = Your DockerHub username
+- `DOCKERHUB_TOKEN` = DockerHub access token (create at hub.docker.com → Account Settings → Security)
+
+**Frontend Build Variables (4 secrets):**
+- `VITE_AUTH0_DOMAIN` = `dev-ijvur34mojpovh8e.us.auth0.com`
+- `VITE_AUTH0_CLIENT_ID` = `tegmEuc40IvXfYFDLIRnJambsa1izkTVL`
+- `VITE_AUTH0_AUDIENCE` = `https://flora-api.com`
+- `VITE_STRIPE_PUBLISHABLE_KEY` = `pk_test_YOUR_KEY_HERE`
+
+**Total: 10 GitHub Secrets**
+
+### Step 5: Update Dockerrun.aws.json with Your DockerHub Image
 
 ```bash
 cd ../apps/backend
 
-# Initialize EB CLI
-eb init -p docker -r ap-southeast-2 flora-backend
-eb use flora-backend-production
+# Edit Dockerrun.aws.json
+nano Dockerrun.aws.json
+```
 
-# Create Dockerrun.aws.json
-cat > Dockerrun.aws.json <<'EOF'
+Change the image name to your DockerHub username:
+
+```json
 {
   "AWSEBDockerrunVersion": "1",
   "Image": {
-    "Name": ".",
+    "Name": "YOUR_DOCKERHUB_USERNAME/flora-backend:latest",
     "Update": "true"
   },
   "Ports": [
@@ -135,137 +210,191 @@ cat > Dockerrun.aws.json <<'EOF'
       "ContainerPort": 3001,
       "HostPort": 80
     }
-  ]
+  ],
+  "Logging": "/var/log/flora-backend"
 }
-EOF
-
-# Deploy
-eb deploy
 ```
 
-**What happens:**
-1. EB CLI zips your code + Dockerfile
-2. Uploads to AWS S3
-3. EC2 instance pulls and builds Docker image (using `apps/backend/Dockerfile`)
-4. Runs container with environment variables from Terraform
-5. Takes ~5 minutes
-
-### Step 4: Run Database Migrations
+### Step 6: Create .ebignore File (Important!)
 
 ```bash
+cd apps/backend
+
+# Create .ebignore to exclude Dockerfile from EB deployment
+cat > .ebignore <<'EOF'
+Dockerfile
+Dockerfile.*
+node_modules/
+src/
+*.test.ts
+coverage/
+.env*
+!.env.example
+dist/
+*.md
+.vscode/
+EOF
+```
+
+**Why?** EB should pull the pre-built image from DockerHub, not try to build from Dockerfile.
+
+### Step 7: Commit and Push to Trigger CI/CD
+
+```bash
+cd ../..  # Back to project root
+
+git add .
+git commit -m "Setup CI/CD with GitHub Actions"
+git push origin li-dev
+```
+
+**This automatically triggers:**
+1. **Backend Workflow** (`.github/workflows/deploy-backend.yml`):
+   - Builds Docker image
+   - Pushes to DockerHub
+   - Deploys to Elastic Beanstalk
+
+2. **Frontend Workflow** (`.github/workflows/deploy-frontend.yml`):
+   - Builds frontend with Docker
+   - Uploads to S3
+   - Invalidates CloudFront cache
+
+**Check Progress:**
+- Go to GitHub → Your repo → **Actions** tab
+- Watch the workflows run (takes ~5-10 minutes)
+
+### Step 8: Run Database Migrations (One-Time Setup)
+
+**Note:** Migrations run automatically on container startup via `package.json` script:
+```json
+"start:prod": "prisma migrate deploy && prisma db seed && node dist/index.js"
+```
+
+But you can manually verify:
+
+```bash
+cd apps/backend
+
 # SSH into EB instance
 eb ssh
 
-# Find running container
-docker ps
+# Check if migrations ran
+docker logs $(docker ps -q) | grep "prisma"
 
-# Run migrations
+# If needed, run manually:
 docker exec $(docker ps -q) npx prisma migrate deploy
 docker exec $(docker ps -q) npx prisma db seed
 
-# Exit
 exit
 ```
 
-### Step 5: Deploy Frontend
-
-**Set Stripe key first:**
-```bash
-export VITE_STRIPE_PUBLISHABLE_KEY="pk_test_YOUR_KEY"
-```
-
-**Option A: Using deployment script (recommended)**
+### Step 9: Test Your Deployment
 
 ```bash
+# Get URLs
 cd ../../terraform
-./scripts/deploy-frontend.sh
+terraform output
+
+# Test backend health
+curl $(terraform output -raw backend_cloudfront_url)/api/health
+# Expected: {"status":"ok","environment":"production"}
+
+# Test backend products
+curl $(terraform output -raw backend_cloudfront_url)/api/products
+# Expected: [{"id":"...","name":"..."}, ...]
+
+# Visit frontend
+# Open the frontend CloudFront URL in browser
+open $(terraform output -raw frontend_cloudfront_url)
 ```
 
-**Option B: Manual deployment**
+## 🔄 Daily Development Workflow
+
+### Making Code Changes
 
 ```bash
-cd ../apps/frontend
+# 1. Make your code changes locally
+# 2. Test locally with Docker
+pnpm docker:dev
 
-# Get backend URL
-BACKEND_URL=$(cd ../../terraform && terraform output -raw backend_api_url)
+# 3. Commit and push
+git add .
+git commit -m "Your change description"
+git push origin li-dev
 
-# Build with Docker (same Dockerfile as local dev)
+# 4. GitHub Actions automatically deploys! ✅
+# Check progress: GitHub → Actions tab
+```
+
+### Workflow Triggers
+
+**Backend deploys when you change:**
+- `apps/backend/**`
+- `pnpm-workspace.yaml`
+- `package.json`
+- `.github/workflows/deploy-backend.yml`
+- `.dockerignore`
+
+**Frontend deploys when you change:**
+- `apps/frontend/**`
+- `pnpm-workspace.yaml`
+- `.github/workflows/deploy-frontend.yml`
+- `.dockerignore`
+
+### Manual Deployment (Fallback)
+
+If GitHub Actions is down, deploy manually:
+
+**Backend:**
+```bash
+# Build and push to DockerHub
+cd apps/backend
+docker build -t YOUR_USERNAME/flora-backend:latest -f Dockerfile ../../
+docker push YOUR_USERNAME/flora-backend:latest
+
+# Deploy to EB
+eb init flora-backend --platform docker --region ap-southeast-2
+eb use flora-backend-production
+eb deploy
+```
+
+**Frontend:**
+```bash
+cd apps/frontend
+
+# Build with Docker
 docker build \
-  --build-arg VITE_API_URL="${BACKEND_URL}/api" \
+  --build-arg VITE_API_URL="https://BACKEND_CLOUDFRONT_URL/api" \
   --build-arg VITE_AUTH0_DOMAIN="dev-ijvur34mojpovh8e.us.auth0.com" \
   --build-arg VITE_AUTH0_CLIENT_ID="tegmEuc40IvXfYFDLIRnJmbsa1izkTVL" \
   --build-arg VITE_AUTH0_AUDIENCE="https://flora-api.com" \
-  --build-arg VITE_STRIPE_PUBLISHABLE_KEY="$VITE_STRIPE_PUBLISHABLE_KEY" \
-  -t flora-frontend-prod \
+  --build-arg VITE_STRIPE_PUBLISHABLE_KEY="pk_test_..." \
+  -t flora-frontend-manual \
   -f Dockerfile \
   ../../
 
-# Extract built files
-docker create --name temp flora-frontend-prod
-docker cp temp:/app/apps/frontend/dist ./dist-aws
+# Extract dist
+docker create --name temp flora-frontend-manual
+docker cp temp:/app/apps/frontend/dist ./dist-manual
 docker rm temp
 
 # Upload to S3
 S3_BUCKET=$(cd ../../terraform && terraform output -raw frontend_s3_bucket)
-aws s3 sync dist-aws/ s3://$S3_BUCKET/ --delete
+aws s3 sync dist-manual/ s3://$S3_BUCKET/ --delete
 
-# Invalidate CloudFront cache
+# Override cache for index.html
+aws s3 cp s3://$S3_BUCKET/index.html s3://$S3_BUCKET/index.html \
+  --metadata-directive REPLACE \
+  --cache-control "public, max-age=0, must-revalidate" \
+  --content-type "text/html"
+
+# Invalidate CloudFront
 CLOUDFRONT_ID=$(cd ../../terraform && terraform output -raw cloudfront_distribution_id)
 aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_ID --paths "/*"
 
 # Cleanup
-rm -rf dist-aws
-```
-
-**What happens:**
-1. Docker builds frontend (same as local: `pnpm docker:prod`)
-2. Extracts `dist/` folder from Docker image
-3. Uploads static files to S3
-4. CloudFront distributes globally
-5. Takes ~3 minutes
-
-### Step 6: Test Your Deployment
-
-```bash
-# Get URLs
-terraform output frontend_cloudfront_url
-terraform output backend_api_url
-
-# Test backend health
-curl $(terraform output -raw backend_api_url)/api/health
-
-# Visit frontend
-# Open the CloudFront URL in your browser
-```
-
-## 🔄 Updating Your Application
-
-### Update Backend Code
-
-```bash
-cd apps/backend
-# Make your code changes
-eb deploy
-```
-
-### Update Frontend Code
-
-```bash
-# Set Stripe key (if not already in env)
-export VITE_STRIPE_PUBLISHABLE_KEY="pk_test_..."
-
-# Run deployment script
-cd terraform
-./scripts/deploy-frontend.sh
-```
-
-### Update Infrastructure
-
-```bash
-cd terraform
-# Edit .tf files (e.g., increase RDS storage)
-terraform plan  # Preview changes
-terraform apply # Apply changes
+rm -rf dist-manual
+docker rmi flora-frontend-manual
 ```
 
 ## 🧹 Cleanup / Delete Everything
@@ -282,7 +411,7 @@ terraform destroy
 - All EC2 instances
 - RDS database (and all data!)
 - S3 bucket (and all files!)
-- CloudFront distribution
+- Both CloudFront distributions
 - VPC and networking
 
 Takes ~10 minutes.
@@ -296,7 +425,7 @@ Takes ~10 minutes.
 | EC2 (t2.micro) | 750 hrs/month | 1 instance 24/7 = 720 hrs | $0 |
 | RDS (db.t3.micro) | 750 hrs/month | 1 instance 24/7 = 720 hrs | $0 |
 | S3 | 5 GB storage | ~500 MB | $0 |
-| CloudFront | 50 GB transfer | ~10 GB | $0 |
+| CloudFront (2 distros) | 50 GB transfer | ~10 GB | $0 |
 | **Total** | | | **$0/month** |
 
 ### After Free Tier
@@ -305,38 +434,24 @@ Takes ~10 minutes.
 |----------|-------------|
 | EC2 t2.micro | ~$8 |
 | RDS db.t3.micro | ~$15 |
-| S3 + CloudFront | ~$2 |
-| **Total** | **~$25/month** |
-
-### Cost Optimization Tips
-
-1. **Stop when not demoing:**
-   ```bash
-   terraform destroy  # Delete everything
-   terraform apply    # Recreate when needed
-   ```
-
-2. **Use AWS Academy credits** (students get $100/year)
-
-3. **Set billing alerts** (AWS Console → Billing → Budgets)
+| S3 + CloudFront | ~$3 |
+| **Total** | **~$26/month** |
 
 ## ❓ Troubleshooting
 
-### Terraform errors
+### GitHub Actions Workflow Fails
 
 ```bash
-# AWS credentials issue
-aws sts get-caller-identity  # Should show your account
+# Check workflow logs
+# GitHub → Your repo → Actions → Click failed workflow
 
-# State lock issue
-terraform force-unlock <LOCK_ID>
-
-# Start fresh
-rm -rf .terraform terraform.tfstate*
-terraform init
+# Common issues:
+# 1. Missing GitHub Secrets → Add them in Settings
+# 2. DockerHub credentials wrong → Regenerate token
+# 3. AWS credentials expired → Update in GitHub Secrets
 ```
 
-### Backend won't deploy
+### Backend Deployment Fails
 
 ```bash
 # Check EB logs
@@ -348,26 +463,25 @@ eb health
 
 # SSH and debug
 eb ssh
-docker logs $(docker ps -q)
+docker ps  # Check if container is running
+docker logs $(docker ps -q)  # Check container logs
 ```
 
-### Frontend not loading
+### Frontend CSS/Assets Not Loading
 
 ```bash
-# Check if files uploaded
+# Check if files uploaded to S3
 aws s3 ls s3://$(terraform output -raw frontend_s3_bucket)
 
-# Check CloudFront status
-aws cloudfront get-distribution \
-  --id $(terraform output -raw cloudfront_distribution_id)
-
-# Re-invalidate cache
+# Check CloudFront cache
 aws cloudfront create-invalidation \
   --distribution-id $(terraform output -raw cloudfront_distribution_id) \
   --paths "/*"
+
+# Wait 1-3 minutes for cache to clear
 ```
 
-### Database connection fails
+### Database Connection Fails
 
 ```bash
 # Get RDS endpoint
@@ -381,34 +495,36 @@ env | grep DATABASE_URL
 
 ## 📞 Need Help?
 
-1. **Terraform Docs:** https://registry.terraform.io/providers/hashicorp/aws/latest/docs
-2. **EB CLI Docs:** https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/eb-cli3.html
-3. **AWS Free Tier:** https://aws.amazon.com/free/
+1. **GitHub Actions Docs:** https://docs.github.com/en/actions
+2. **DockerHub Docs:** https://docs.docker.com/docker-hub/
+3. **Terraform Docs:** https://registry.terraform.io/providers/hashicorp/aws/latest/docs
+4. **EB CLI Docs:** https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/eb-cli3.html
 
-## ✅ Checklist
+## ✅ Deployment Checklist
 
 Before presenting/demoing:
 
 - [ ] Terraform apply completed successfully
-- [ ] Backend deployed and healthy (`eb health`)
-- [ ] Database migrated and seeded
-- [ ] Frontend deployed to S3
-- [ ] CloudFront cache invalidated
+- [ ] GitHub Secrets configured (all 10)
+- [ ] Dockerrun.aws.json updated with your DockerHub username
+- [ ] .ebignore file created in apps/backend
+- [ ] Pushed to GitHub and workflows succeeded (green checkmarks)
+- [ ] Backend API responds: `curl BACKEND_CLOUDFRONT_URL/api/health`
 - [ ] Frontend loads in browser
-- [ ] Backend API responds to health check
 - [ ] Can log in with Auth0
 - [ ] Can add items to cart
-- [ ] Payment flow works (Stripe test mode)
+- [ ] Payment form appears (Stripe integration)
 
 ## 🎓 For Your Portfolio
 
 Mention in interviews:
 
 - ✅ Infrastructure as Code (Terraform)
-- ✅ AWS multi-service architecture (RDS, EB, S3, CloudFront)
+- ✅ **CI/CD Pipelines (GitHub Actions)** ← This is impressive!
 - ✅ Docker containerization (consistent dev → prod)
-- ✅ CI/CD automation
+- ✅ Multi-service AWS architecture (RDS, EB, S3, CloudFront)
+- ✅ Automated testing and deployment
+- ✅ Security best practices (secrets management, private subnets)
 - ✅ Cost optimization (free tier usage)
-- ✅ Security best practices (private subnets, security groups)
 
-This demonstrates strong **DevOps** and **Cloud Engineering** skills!
+This demonstrates strong **DevOps**, **Cloud Engineering**, and **Automation** skills!

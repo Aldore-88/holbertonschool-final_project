@@ -1,8 +1,15 @@
 # Flora AWS Deployment - Docker Workflow
 
+> **📌 Note:** This document explains the Docker fundamentals and manual deployment process.
+> **For automated CI/CD deployment** (recommended for daily development), see [`QUICK_START.md`](./QUICK_START.md).
+
 ## 🐳 Fully Dockerized Deployment Strategy
 
 Since Flora is **fully Dockerized**, we maintain consistency across local dev, testing, and AWS production.
+
+**Deployment Evolution:**
+- **Manual (this doc):** Docker build → manual push → manual deploy
+- **CI/CD (QUICK_START.md):** Git push → GitHub Actions → automatic deployment
 
 ## 🏗️ Architecture Recap
 
@@ -72,7 +79,7 @@ eb deploy
 # 4. Map container port 3001 → host port 80
 ```
 
-#### Option B: Deploy from Docker Hub/ECR
+#### Option B: Deploy from Docker Hub/ECR (Recommended for CI/CD)
 
 ```bash
 cd apps/backend
@@ -97,13 +104,34 @@ cat > Dockerrun.aws.json <<'EOF'
       "ContainerPort": 3001,
       "HostPort": 80
     }
-  ]
+  ],
+  "Logging": "/var/log/flora-backend"
 }
+EOF
+
+# Create .ebignore to prevent EB from building locally
+cat > .ebignore <<'EOF'
+Dockerfile
+Dockerfile.*
+node_modules/
+src/
+*.test.ts
+coverage/
+.env*
+!.env.example
+dist/
+*.md
+.vscode/
 EOF
 
 # Deploy
 eb deploy
 ```
+
+**Why .ebignore?**
+- Prevents EB from seeing the Dockerfile
+- Forces EB to pull the pre-built image from DockerHub
+- Avoids build failures from monorepo context issues
 
 #### Running Migrations on EB
 
