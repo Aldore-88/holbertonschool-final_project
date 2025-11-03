@@ -121,7 +121,8 @@ h6 {
     font-weight: normal;
 }
 
-a {
+/* Scoped to navigation only - don't apply to all links globally */
+.top-nav-bar a {
     text-decoration: underline;
     color: var(--text-colour);
     font-family: var(--primary-font-web-copy);
@@ -141,19 +142,20 @@ a {
     cursor: pointer;
 }
 
-a img{
+/* Scoped to navigation only */
+.top-nav-bar a img{
     width:30px;
     height:30px;
 }
 
-ul {
+.top-nav-bar ul {
     display: flex;
     gap: 50px;
     padding: 0;
     margin: 0;
 }
 
-li {
+.top-nav-bar li {
     list-style: none;
 }
 
