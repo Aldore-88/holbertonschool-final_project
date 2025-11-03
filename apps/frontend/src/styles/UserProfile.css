@@ -419,6 +419,7 @@
 .cancel-btn {
   background: #ffe6e6;
   color: #d14343;
+}
 
 .cancel-btn:hover:not(:disabled) {
   background: #d4dcd1;
