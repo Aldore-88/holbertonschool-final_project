@@ -10,6 +10,7 @@ on:
       - 'pnpm-workspace.yaml'
       - 'package.json'
       - '.github/workflows/deploy-backend.yml'
+      - '.dockerignore'
 
 env:
   DOCKER_IMAGE: liduong/flora-backend

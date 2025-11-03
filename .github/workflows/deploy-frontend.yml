@@ -9,6 +9,7 @@ on:
       - 'apps/frontend/**'
       - 'pnpm-workspace.yaml'
       - '.github/workflows/deploy-frontend.yml'
+      - '.dockerignore'
 
 env:
   S3_BUCKET: flora-frontend-production-b001bddb

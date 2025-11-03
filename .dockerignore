@@ -43,9 +43,6 @@ build
 # Terraform (not needed in Docker image)
 terraform/
 
-# Frontend (not needed in backend image)
-apps/frontend/
-
 # Database
 *.db
 *.sqlite
