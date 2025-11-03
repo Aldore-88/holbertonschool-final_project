@@ -11,6 +11,7 @@ on:
       - 'package.json'
       - '.github/workflows/deploy-backend.yml'
       - '.dockerignore'
+      - 'terraform/**'
 
 env:
   DOCKER_IMAGE: liduong/flora-backend
