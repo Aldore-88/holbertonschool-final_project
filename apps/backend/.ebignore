@@ -1,0 +1,24 @@
+# Exclude Dockerfile (we use pre-built image from DockerHub)
+Dockerfile
+Dockerfile.*
+
+# Exclude development files
+node_modules/
+src/
+*.test.ts
+*.test.js
+coverage/
+.env*
+!.env.example
+
+# Exclude build artifacts (not needed, image is pre-built)
+dist/
+
+# Exclude documentation
+*.md
+README*
+
+# Exclude IDE files
+.vscode/
+.idea/
+*.swp
