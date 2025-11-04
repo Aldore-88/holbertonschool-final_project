@@ -141,7 +141,8 @@ a {
     cursor: pointer;
 }
 
-a img{
+/* Only apply small image size to top-nav icons, not the logo */
+.top-nav-bar a img{
     width:30px;
     height:30px;
 }
