@@ -1,0 +1,57 @@
+# Dependencies
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Git
+.git
+.gitignore
+.github
+
+# Testing
+coverage
+*.test.ts
+*.test.js
+__tests__
+.jest
+
+# Development
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Documentation
+*.md
+docs/
+README*
+LICENSE
+
+# Environment files (will be set in EB)
+.env
+.env.*
+!.env.example
+
+# Build artifacts (will be rebuilt in Docker)
+dist
+build
+*.log
+
+# Terraform (not needed in Docker image)
+terraform/
+
+# Database
+*.db
+*.sqlite
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+*.tmp

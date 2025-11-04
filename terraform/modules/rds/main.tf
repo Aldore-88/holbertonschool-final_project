@@ -37,7 +37,7 @@ resource "aws_security_group" "rds" {
 resource "aws_db_instance" "postgres" {
   identifier     = "${var.project_name}-db"
   engine         = "postgres"
-  engine_version = "16.3" # Latest PostgreSQL version in free tier
+  engine_version = "16" # PostgreSQL 16.8 (16.3 doesn't exist in AWS)
   instance_class = "db.t3.micro" # Free tier eligible
 
   allocated_storage     = 20 # Free tier: 20GB

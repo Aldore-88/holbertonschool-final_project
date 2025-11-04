@@ -73,3 +73,47 @@ variable "stripe_publishable_key" {
   description = "Stripe publishable key (for frontend)"
   type        = string
 }
+
+variable "stripe_webhook_secret" {
+  description = "Stripe webhook signing secret"
+  type        = string
+  sensitive   = true
+}
+
+# Gemini AI Variables
+variable "gemini_api_key" {
+  description = "Google Gemini AI API key for gift message generation"
+  type        = string
+  sensitive   = true
+}
+
+# Email/SMTP Variables
+variable "smtp_host" {
+  description = "SMTP server host (e.g., smtp.gmail.com)"
+  type        = string
+  default     = "smtp.gmail.com"
+}
+
+variable "smtp_port" {
+  description = "SMTP server port"
+  type        = string
+  default     = "587"
+}
+
+variable "smtp_secure" {
+  description = "SMTP secure connection (true/false)"
+  type        = string
+  default     = "false"
+}
+
+variable "smtp_user" {
+  description = "SMTP username/email"
+  type        = string
+  sensitive   = true
+}
+
+variable "smtp_pass" {
+  description = "SMTP password (use app password for Gmail)"
+  type        = string
+  sensitive   = true
+}

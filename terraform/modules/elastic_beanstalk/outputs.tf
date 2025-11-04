@@ -22,3 +22,18 @@ output "cname" {
   description = "CNAME for the environment"
   value       = aws_elastic_beanstalk_environment.backend.cname
 }
+
+output "cloudfront_url" {
+  description = "CloudFront HTTPS URL for backend API (use this for Stripe webhooks)"
+  value       = "https://${aws_cloudfront_distribution.backend.domain_name}"
+}
+
+output "cloudfront_domain" {
+  description = "CloudFront domain name"
+  value       = aws_cloudfront_distribution.backend.domain_name
+}
+
+output "cloudfront_distribution_id" {
+  description = "CloudFront distribution ID (for cache invalidation)"
+  value       = aws_cloudfront_distribution.backend.id
+}

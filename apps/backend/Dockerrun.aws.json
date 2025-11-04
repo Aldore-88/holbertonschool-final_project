@@ -1,0 +1,14 @@
+{
+  "AWSEBDockerrunVersion": "1",
+  "Image": {
+    "Name": "liduong/flora-backend:latest",
+    "Update": "true"
+  },
+  "Ports": [
+    {
+      "ContainerPort": 3001,
+      "HostPort": 80
+    }
+  ],
+  "Logging": "/var/log/flora-backend"
+}
