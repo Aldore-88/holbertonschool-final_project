@@ -1,0 +1,59 @@
+name: Restock Production Inventory
+
+# Manual trigger only - run this when you need to restock products
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "RESTOCK" to confirm'
+        required: true
+        default: ''
+
+jobs:
+  restock:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validate confirmation
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "RESTOCK" ]; then
+            echo "❌ Confirmation failed. You must type 'RESTOCK' to proceed."
+            exit 1
+          fi
+          echo "✅ Confirmation received"
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install backend dependencies
+        working-directory: ./apps/backend
+        run: pnpm install
+
+      - name: Generate Prisma Client
+        working-directory: ./apps/backend
+        run: npx prisma generate
+
+      - name: Run restock script
+        working-directory: ./apps/backend
+        env:
+          DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+        run: |
+          echo "🔄 Restocking production inventory..."
+          node update-all-stock.js
+          echo "✅ Restock complete!"
+
+      - name: Success summary
+        run: |
+          echo "✅ Production inventory restocked successfully!"
+          echo "📦 All low-stock products now have 100 units"
+          echo "🌐 Changes are live immediately"

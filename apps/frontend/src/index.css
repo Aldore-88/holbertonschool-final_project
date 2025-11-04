@@ -34,7 +34,7 @@
     --button-colour1: #C8D7C4;
     --button-colour2: #E0E8E0;
     --button-colour3: #595E4E;
-    
+
     --primary-font-web-copy: "EB Garamond",Georgia, serif;
     --primary-font-body-copy: "Outfit", Arial, sans-serif;
 }
@@ -113,7 +113,7 @@ h4 {
 
 h5 {
     font-size: 20px;
-    font-weight: normal; 
+    font-weight: normal;
 }
 
 h6 {
@@ -141,7 +141,7 @@ a {
     cursor: pointer;
 }
 
-a img{
+.top-nav-bar a img{
     width:30px;
     height:30px;
 }
