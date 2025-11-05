@@ -399,15 +399,19 @@ export class OrderService {
     for (const item of items) {
       const product = await prisma.product.findUnique({
         where: { id: item.productId },
-        select: { id: true, inStock: true, stockCount: true, isActive: true },
+        select: { id: true, name: true, inStock: true, stockCount: true, isActive: true },
       });
 
       if (!product || !product.isActive) {
-        throw new Error(`Product ${item.productId} is not available`);
+        throw new Error(`Product ${product?.name || item.productId} is not available`);
       }
 
-      if (!product.inStock || product.stockCount < item.quantity) {
-        throw new Error(`Product ${item.productId} is out of stock`);
+      if (!product.inStock) {
+        throw new Error(`${product.name} is out of stock`);
+      }
+
+      if (product.stockCount < item.quantity) {
+        throw new Error(`${product.name} has insufficient stock. Only ${product.stockCount} available, but ${item.quantity} requested`);
       }
     }
   }
