@@ -221,6 +221,18 @@ docker exec flora-backend pnpm test:coverage
 
 ---
 
+## 📦 Stock Management
+
+For demo and testing purposes, you can replenish product stock:
+
+```bash
+# Restock all products to 100 units
+docker exec flora-backend pnpm restock
+```
+
+This sets all products with low stock (`< 10 units`) or `inStock: false` back to 100 units and `inStock: true`.
+---
+
 ## 📚 Documentation
 
 Detailed guides for development, testing, and database management:
