@@ -150,12 +150,12 @@ export class EmailService {
       html: `
         <div style="font-family: 'Outfit', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff;">
           <!-- Logo Section -->
-          <div style="text-align: center; padding: 2rem 0;">
-            <div style="font-size: 1.5rem; font-weight: 600; color: #5a5a4a; letter-spacing: 2px;">FLORA</div>
+          <div style="text-align: center; padding: 2rem 0; width: 100%; box-sizing: border-box;">
+            <img src="https://i.imgur.com/yWZVxUd.png" alt="FLORA" style="max-width: 200px; height: auto; display: block; margin: 0 auto;">
           </div>
 
           <!-- Header Section -->
-          <div style="background: #C8D7C4; width: 100%; padding: 2rem; text-align: center; margin-bottom: 2rem;">
+          <div style="background: #C8D7C4; width: 100%; padding: 2rem 2rem; text-align: center; box-sizing: border-box;">
             <h1 style="color: #595E4E; font-size: 36px; font-weight: 600; font-family: 'EB Garamond', Georgia, serif; margin: 0 0 1rem 0; letter-spacing: 2px;">ORDER CONFIRMATION</h1>
 
             <!-- Order Number Highlight -->
@@ -169,7 +169,7 @@ export class EmailService {
           </div>
 
           <!-- Order Summary Section -->
-          <div style="padding: 2rem; text-align: center;">
+          <div style="padding: 2rem; text-align: center; width: 100%; box-sizing: border-box;">
             <h2 style="color: #595E4E; font-size: 36px; font-weight: 600; font-family: 'EB Garamond', Georgia, serif; margin-bottom: 0.5rem;">Order Summary</h2>
             <p style="color: #595E4E; font-size: 16px; margin-bottom: 2rem;">${this.formatDate(order.createdAt)}</p>
 
@@ -197,7 +197,7 @@ export class EmailService {
           </div>
 
           <!-- Billing and Shipping Section -->
-          <div style="padding: 2rem; text-align: center;">
+          <div style="padding: 2rem; text-align: center; width: 100%; box-sizing: border-box;">
             <h2 style="color: #595E4E; font-size: 36px; font-family: 'EB Garamond', Georgia, serif; font-weight: 600; margin-bottom: 2rem;">Billing and Shipping</h2>
 
             <table style="width: 100%; max-width: 500px; margin: 0 auto; border-collapse: collapse;">
@@ -235,8 +235,8 @@ export class EmailService {
             </div>
           </div>
 
-          <!-- Footer Message -->
-          <div style="padding: 2rem; text-align: center; background: #C8D7C4;">
+          <!-- Footer Section -->
+          <div style="background: #C8D7C4; width: 100%; padding: 2rem 2rem; text-align: center; box-sizing: border-box;">
             <p style="color: #595E4E; font-size: 0.95rem; line-height: 1.6; margin: 0 0 1rem 0;">We'll send you another email when your order ships with tracking information.</p>
             <p style="color: #595E4E; font-size: 0.95rem; margin: 0;">Thank you for choosing Flora!</p>
             <p style="color: #595E4E; font-size: 0.95rem; font-weight: 500; margin: 0.5rem 0 0 0;">The Flora Team</p>
