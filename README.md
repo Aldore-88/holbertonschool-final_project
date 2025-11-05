@@ -178,7 +178,12 @@ pnpm docker:setup
 
 # 4. Start development servers (in background)
 pnpm docker:dev:bg
+
+# 5. Restock products (optional - for testing checkout)
+docker exec flora-backend pnpm restock
 ```
+
+**Note:** The restock command sets all products with low stock (`< 10 units`) to 100 units. Useful for testing checkout flows.
 
 ### Access the Application
 
@@ -219,18 +224,6 @@ docker exec flora-backend pnpm test:coverage
 
 **All tests must pass before merging to main.** CI/CD pipeline automatically runs tests on every push.
 
----
-
-## 📦 Stock Management
-
-For demo and testing purposes, you can replenish product stock:
-
-```bash
-# Restock all products to 100 units
-docker exec flora-backend pnpm restock
-```
-
-This sets all products with low stock (`< 10 units`) or `inStock: false` back to 100 units and `inStock: true`.
 ---
 
 ## 📚 Documentation
