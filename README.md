@@ -20,9 +20,7 @@ Flora is a modern flowers and plants marketplace featuring flexible purchasing o
 
 ### 🌐 Live Application
 
-**👉 [https://flora-4h2n.onrender.com](https://flora-4h2n.onrender.com)** - Deployed on Render
-
-_⏱️ First load may take 30-60 seconds as the backend wakes from idle state_
+**👉 [Live URL](https://d1fgjrmf4cfwou.cloudfront.net)** - _⚙️ Hosted via AWS CloudFront (Free Tier)_
 
 **Try these features:**
 
@@ -180,7 +178,12 @@ pnpm docker:setup
 
 # 4. Start development servers (in background)
 pnpm docker:dev:bg
+
+# 5. Restock products (optional - for testing checkout)
+docker exec flora-backend pnpm restock
 ```
+
+**Note:** The restock command sets all products with low stock (`< 10 units`) to 100 units. Useful for testing checkout flows.
 
 ### Access the Application
 

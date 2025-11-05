@@ -120,14 +120,14 @@ describe('OrderController Tests', () => {
         body: mockOrderData,
       };
 
-      mockOrderService.createOrder.mockRejectedValue(new Error('Product product-1 is out of stock'));
+      mockOrderService.createOrder.mockRejectedValue(new Error('Rose Bouquet is out of stock'));
 
       await orderController.createOrder(mockReq as AuthRequest, mockRes as Response);
 
       expect(mockRes.status).toHaveBeenCalledWith(400);
       expect(mockRes.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Product product-1 is out of stock',
+        error: 'Rose Bouquet is out of stock',
       });
     });
 
