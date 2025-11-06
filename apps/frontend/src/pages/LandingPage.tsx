@@ -139,7 +139,7 @@ const LandingPage: React.FC = () => {
 
       <div className="picture-container">
         <div className="image-container">
-          <img src="/assets/landing-image.png" alt="Flora flowers"></img>
+          <img src="/assets/banner-logo.jpg" alt="Flora flowers"></img>
         </div>
       </div>
 
