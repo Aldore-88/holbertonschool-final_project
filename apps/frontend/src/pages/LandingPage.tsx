@@ -94,7 +94,8 @@ const LandingPage: React.FC = () => {
   
 
   return (
-    <div>
+    <div className="landing-page-wrapper">
+      {/* Subscription Info - First on Desktop */}
       <div className="details-container">
         <div id="flower" className="details-card">
           <div className="details-icon">
@@ -137,12 +138,14 @@ const LandingPage: React.FC = () => {
         </div>
       </div>
 
+      {/* White flowers image */}
       <div className="picture-container">
         <div className="image-container">
           <img src="/assets/landing-image.png" alt="Flora flowers"></img>
         </div>
       </div>
 
+      {/* Category Cards */}
       <div className="shop-by-container">
         <div className="shop-by-card">
           <a href="/products">
@@ -187,15 +190,16 @@ const LandingPage: React.FC = () => {
           </div>
           </a>
         </div>
-
       </div>
+
+      {/* Product Samples */}
       <div className="card-container">
-              <div className="product-card-grid-container">
-                <ProductGrid
-                  products={products}
-                  isLoading={isLoading}
-                />
-              </div>
+        <div className="product-card-grid-container">
+          <ProductGrid
+            products={products}
+            isLoading={isLoading}
+          />
+        </div>
       </div>
     </div>
   );

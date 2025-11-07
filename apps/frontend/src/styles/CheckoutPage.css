@@ -75,16 +75,14 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   min-height: 100vh;
-  /* background-color: red; */
+  gap: 1rem;
+  padding: 0 1rem;
 }
 
-/* Left Column - Form */
 .checkout-left {
   padding: 2rem;
-  /* background-color: #ffffff; */
-  /* max-width: 700px; */
   width: 100%;
-  margin: 0 5rem 0 0.5rem;
+  margin: 0 2rem 0 0.5rem;
 }
 
 .checkout-logo-placeholder {
@@ -161,14 +159,14 @@
 /* Right Column - Order Summary */
 .checkout-right {
   background-color: #C8D7C4;
-  padding: 1rem 3rem;
+  padding: 1rem 2rem;
   border: 2px solid #595E4E;
   border-radius: 10px;
   position: sticky;
   top: 0;
   height: 100vh;
   margin:0px;
-  /* overflow-y: auto; */
+  overflow-y: auto;
   font-family: "Outfit", sans-serif;
   width: 100%;
 }
@@ -243,6 +241,12 @@
 @media (max-width: 1024px) {
   .checkout-container {
     grid-template-columns: 1fr;
+    padding: 0 0.5rem;
+  }
+
+  .checkout-left {
+    padding: 2rem 1.5rem;
+    margin: 0;
   }
 
   .checkout-right {
@@ -250,19 +254,40 @@
     height: auto;
     border-left: none;
     border-top: 1px solid #e8c8d7;
-  }
-
-  .checkout-left {
     padding: 2rem 1.5rem;
   }
 }
 
 @media (max-width: 768px) {
+  .checkout-container {
+    padding: 0;
+  }
+
   .checkout-left {
     padding: 1.5rem 1rem;
+    margin: 0;
   }
 
   .checkout-right {
     padding: 1.5rem 1rem;
+  }
+
+  .checkout-logo-placeholder {
+    padding: 1.5rem 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .checkout-left {
+    padding: 1rem 0.5rem;
+  }
+
+  .checkout-right {
+    padding: 1rem 0.5rem;
+  }
+
+  .checkout-logo-placeholder {
+    font-size: 1.2rem;
+    padding: 1rem 0;
   }
 }

@@ -56,38 +56,11 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
   };
 
   return (
-    <div className="filter-sidebar">
-      {/* Sidebar Header */}
-      <header className="filter-header">
-        {/* <h4>Filter Products FilterSidebar.tsx</h4> */}
-
-        {/* Show active filter count and clear button if filters are applied */}
-        {/* {activeFilterCount > 0 && (
-          <div className="filter-header-actions">
-            <span className="active-filters">
-              {activeFilterCount} filter{activeFilterCount > 1 ? 's' : ''}{' '}
-              active
-            </span>
-            <button
-              className="clear-all-btn"
-              onClick={onClearFilters}
-            >
-              Clear All
-            </button>
-          </div>
-        )} */}
-      </header>
-
+    <div className="filter-sidebar-content">
       {/* Filter Options */}
       <div className="filter-options">
         {/* Price Range Filter */}
         <div className="filter-group">
-          {/* <label
-            htmlFor="price-filter"
-            className="filter-label"
-          >
-            Price Range
-          </label> */}
           <select
             id="price-filter"
             value={selectedFilters.priceRange || ''}
@@ -110,12 +83,6 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
 
         {/* Color Filter */}
         <div className="filter-group">
-          {/* <label
-            htmlFor="color-filter"
-            className="filter-label"
-          >
-            Color
-          </label> */}
           <select
             id="color-filter"
             value={selectedFilters.color || ''}
@@ -137,12 +104,6 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
 
         {/* Mood Filter */}
         <div className="filter-group">
-          {/* <label
-            htmlFor="mood-filter"
-            className="filter-label"
-          >
-            Mood
-          </label> */}
           <select
             id="mood-filter"
             value={selectedFilters.mood || ''}
@@ -164,12 +125,6 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
 
         {/* Season Filter */}
         <div className="filter-group">
-          {/* <label
-            htmlFor="season-filter"
-            className="filter-label"
-          >
-            Season
-          </label> */}
           <select
             id="season-filter"
             value={selectedFilters.season || ''}
@@ -191,12 +146,6 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
 
         {/* Occasion Filter */}
         <div className="filter-group">
-          {/* <label
-            htmlFor="occasion-filter"
-            className="filter-label"
-          >
-            Occasion
-          </label> */}
           <select
             id="occasion-filter"
             value={selectedFilters.occasion || ''}
@@ -218,12 +167,6 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
 
         {/* Product Type Filter */}
         <div className="filter-group">
-          {/* <label
-            htmlFor="type-filter"
-            className="filter-label"
-          >
-            Product Type
-          </label> */}
           <select
             id="type-filter"
             value={selectedFilters.type || ''}
@@ -245,12 +188,6 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
 
         {/* Stock Filter */}
         <div className="filter-group">
-          {/* <label
-            htmlFor="stock-filter"
-            className="filter-label"
-          >
-            Availability
-          </label> */}
           <select
             id="stock-filter"
             value={
@@ -274,16 +211,6 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
           </select>
         </div>
       </div>
-
-      {/* Filter Tips */}
-      {/* <div className="filter-tips">
-        <h4>Filter Tips:</h4>
-        <ul>
-          <li>Select multiple filters to narrow down results</li>
-          <li>Use search to find specific flower names</li>
-          <li>Clear filters to see all available products</li>
-        </ul>
-      </div> */}
     </div>
   );
 };

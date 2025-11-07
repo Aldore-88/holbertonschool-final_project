@@ -188,3 +188,77 @@ p {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-colour);
 }
+
+/* Mobile Responsive Typography */
+@media (max-width: 1024px) {
+  h1 {
+    font-size: 96px;
+    letter-spacing: 0.08em;
+  }
+
+  h2 {
+    font-size: 48px;
+  }
+
+  a {
+    font-size: 18px;
+  }
+
+  ul {
+    gap: 30px;
+  }
+}
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 3rem;
+    letter-spacing: 0.05em;
+  }
+
+  h2 {
+    font-size: 2rem;
+  }
+
+  h3 {
+    font-size: 18px;
+  }
+
+  a {
+    font-size: 16px;
+  }
+
+  ul {
+    gap: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 2rem;
+    letter-spacing: 0.03em;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  h3 {
+    font-size: 16px;
+  }
+
+  h4 {
+    font-size: 14px;
+  }
+
+  a {
+    font-size: 14px;
+  }
+
+  p {
+    font-size: 14px;
+  }
+
+  ul {
+    gap: 15px;
+  }
+}
