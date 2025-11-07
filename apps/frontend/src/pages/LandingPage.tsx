@@ -91,7 +91,7 @@ const LandingPage: React.FC = () => {
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
-  
+
 
   return (
     <div className="landing-page-wrapper">
@@ -141,7 +141,7 @@ const LandingPage: React.FC = () => {
       {/* White flowers image */}
       <div className="picture-container">
         <div className="image-container">
-          <img src="/assets/landing-image.png" alt="Flora flowers"></img>
+          <img src="/assets/baby-breath.png" alt="Flora flowers"></img>
         </div>
       </div>
 
