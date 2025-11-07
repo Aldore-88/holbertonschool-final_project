@@ -66,6 +66,10 @@
   border-bottom: none;
 }
 
+.clickable {
+  cursor: pointer;
+}
+
 .item-image {
   display: table-cell;
   width: 180px;
@@ -277,8 +281,6 @@
   font-size: 1rem;
   font-family: "Outfit", sans-serif;
   color: #595E4E;
-  /* background-color: #C8D7C4;
-  border: 2px solid #595E4E; */
   border-radius: 10px;
   margin-bottom: 1rem;
 }
@@ -288,13 +290,11 @@
 }
 
 .total-line {
-  /* border: 2px solid #595E4E; */
   margin-top: 0;
   padding: 0.875rem 1.25rem;
   font-weight: 600;
   font-size: 1.125rem;
   font-family: "Outfit", sans-serif;
-  /* background-color: #C8D7C4; */
 }
 
 .total-amount {
@@ -310,10 +310,9 @@
   color: #595E4E;
   font-size: 1rem;
   font-weight: 600;
-  font: bold;
   font-family: "Outfit", sans-serif;
   text-align: center;
-  border-left: 3px solid #b1b8a3
+  border-left: 3px solid #b1b8a3;
 }
 
 /* Purchase Type and Message Options */
@@ -629,12 +628,6 @@
   .purchase-options-grid {
     grid-template-columns: 1fr;
   }
-
-  .cart-header,
-  .cart-item {
-    grid-template-columns: 100px 1.5fr 120px 80px 60px;
-    gap: 1rem;
-  }
 }
 
 @media (max-width: 768px) {
@@ -661,22 +654,63 @@
   }
 
   .item-image img {
-    width: 200px;
-    height: 240px;
+    width: 300px;
+    height: 340px;
   }
 
-  .item-description,
-  .item-quantity,
-  .item-price,
-  .item-delete {
+  .item-description {
     width: 100%;
     display: block;
     text-align: left;
     padding: 0;
   }
 
+  /* Quantity, Price, and Delete on one line */
+  .item-actions-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+  }
+
+  .item-quantity {
+    flex: 0 0 auto;
+    display: flex;
+    width: auto;
+    padding: 0;
+  }
+
   .item-quantity > div {
     justify-content: flex-start;
+  }
+
+  .item-price {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    width: auto;
+    padding: 0;
+  }
+
+  .price-display {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .subscription-frequency {
+    font-size: 0.75rem;
+    margin-top: 0;
+    text-align: right;
+  }
+
+  .item-delete {
+    flex: 0 0 auto;
+    display: flex;
+    width: auto;
+    padding: 0;
   }
 
   .cart-bottom-section {
@@ -729,8 +763,8 @@
   }
 
   .item-image img {
-    width: 150px;
-    height: 180px;
+    width: 230px;
+    height: 280px;
   }
 
   .purchase-column {
