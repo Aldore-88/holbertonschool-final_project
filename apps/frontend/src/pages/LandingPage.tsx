@@ -1,96 +1,16 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import type { Product, ProductResponse } from '../types';
-import { apiService } from '../services/api';
+import React from 'react';
+import { useProductsWithFilters } from '../hooks/useProducts';
 import ProductGrid from '../components/ProductGrid';
 import './ProductsPage.css';
 import './LandingPage.css';
 
 const LandingPage: React.FC = () => {
-  // Get URL query parameters (e.g., ?filter=colour or ?category=romantic)
-  const [searchParams] = useSearchParams();
-
-  // State for storing the current products being displayed
-  const [products, setProducts] = useState<Product[]>([]);
-
-  // State for storing user's currently selected filters
-  const [selectedFilters, setSelectedFilters] = useState<any>({
-    page: 1,
+  // Use the custom hook with limit of 3 products for landing page
+  const { products, isLoading } = useProductsWithFilters({
     limit: 3,
+    enablePagination: false,
+    enableFilters: false,
   });
-
-  // State for loading indicator
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  /**
-   * Effect hook to read URL query parameters and apply filters on mount
-   * This allows links like /products?filter=colour or /products?search=roses to automatically filter
-   */
-  useEffect(() => {
-    const urlCategory = searchParams.get('category');
-    const urlSearch = searchParams.get('search');
-
-    // Map category names to appropriate filters
-    const categoryMapping: Record<string, any> = {
-      romantic: { mood: 'ROMANTIC' },
-      cheerful: { mood: 'CHEERFUL' },
-      elegant: { mood: 'ELEGANT' },
-      // "seasonal" shows all products (no filter)
-      seasonal: {},
-      // "special" could filter by special occasions, but for now show all
-      special: {},
-    };
-
-    const filters = urlCategory ? categoryMapping[urlCategory.toLowerCase()] || {} : {};
-
-    // Always reset filters to match URL params (or reset to default if no params)
-    setSelectedFilters({
-      page: 1,
-      limit: 3,
-      ...filters,
-      ...(urlSearch && { search: urlSearch }), // Add search term from URL if present
-    });
-  }, [searchParams]);
-
-  /**
-   * Function to fetch products from the backend API
-   * This function is called whenever filters change or page loads
-   */
-  const fetchProducts = useCallback(async () => {
-    try {
-      setIsLoading(true);
-
-      // Convert our filters object to query parameters for the API
-      const queryParams: Record<string, string> = {};
-
-      // Only add filter parameters if they have values (not empty strings)
-      Object.entries(selectedFilters).forEach(([key, value]) => {
-        if (value !== '' && value !== undefined && value !== null) {
-          queryParams[key] = value.toString();
-        }
-      });
-
-      // Call the backend API with our filters
-      const response: ProductResponse = await apiService.getProducts(
-        queryParams
-      );
-
-      // Update our component state with the response data
-      setProducts(response.products);
-    } catch (err) {
-      console.error('Error fetching products:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [selectedFilters]);
-
-  /**i
-   * Effect hook that runs when component mounts and when filters change
-   * This ensures we always fetch fresh data when user changes filters
-   */
-  useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
 
 
   return (
