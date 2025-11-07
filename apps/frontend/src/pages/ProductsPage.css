@@ -844,12 +844,11 @@
     max-width: none;
     padding: 1rem 0.75rem;
   }
-
   .filter-sidebar-content {
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding-top: 205px;
+    padding-top: 290px;
     overflow-y: auto;
   }
 
