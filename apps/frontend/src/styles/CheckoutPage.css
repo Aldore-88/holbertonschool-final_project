@@ -249,6 +249,10 @@
     margin: 0;
   }
 
+  .checkout-right-container {
+    padding: 2rem;
+  }
+
   .checkout-right {
     position: relative;
     height: auto;
@@ -261,11 +265,16 @@
 @media (max-width: 768px) {
   .checkout-container {
     padding: 0;
+    gap: 0.5rem;
   }
 
   .checkout-left {
     padding: 1.5rem 1rem;
     margin: 0;
+  }
+
+  .checkout-right-container {
+    padding: 1.5rem 1rem;
   }
 
   .checkout-right {
@@ -274,20 +283,51 @@
 
   .checkout-logo-placeholder {
     padding: 1.5rem 0;
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .checkout-header {
+    margin-bottom: 2rem;
+  }
+
+  .cart-button svg {
+    width: 28px;
+    height: 28px;
   }
 }
 
 @media (max-width: 480px) {
   .checkout-left {
-    padding: 1rem 0.5rem;
+    padding: 1rem 0.75rem;
+  }
+
+  .checkout-right-container {
+    padding: 1rem 0.75rem;
   }
 
   .checkout-right {
-    padding: 1rem 0.5rem;
+    padding: 1rem 0.75rem;
   }
 
   .checkout-logo-placeholder {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     padding: 1rem 0;
+    margin-bottom: 1rem;
+  }
+
+  .checkout-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .cart-button svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .cart-count {
+    width: 16px;
+    height: 16px;
+    font-size: 0.65rem;
   }
 }
