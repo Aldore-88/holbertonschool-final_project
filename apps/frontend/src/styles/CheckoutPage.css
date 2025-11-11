@@ -256,8 +256,7 @@
   .checkout-right {
     position: relative;
     height: auto;
-    border-left: none;
-    border-top: 1px solid #e8c8d7;
+    border: 2px solid #595E4E;
     padding: 2rem 1.5rem;
   }
 }
@@ -279,6 +278,7 @@
 
   .checkout-right {
     padding: 1.5rem 1rem;
+    /* background-color: blue; */
   }
 
   .checkout-logo-placeholder {
