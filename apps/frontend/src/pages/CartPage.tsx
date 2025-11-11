@@ -26,8 +26,7 @@ const CartPage: React.FC = () => {
   };
 
   const handleCheckout = () => {
-    // Save message to cart items if needed
-    window.location.href = '/checkout';
+    navigate('/checkout');
   };
 
   const handleGenerateAIMessage = async () => {
@@ -39,8 +38,8 @@ const CartPage: React.FC = () => {
       const keywords = firstProduct ? `flowers, ${firstProduct.name}` : 'flowers, gift';
 
       const requestPayload: Parameters<typeof apiService.generateAIMessage>[0] = {
-        to: giftMessage.to || undefined,
-        from: giftMessage.from || undefined,
+        to: giftMessage.to?.trim() || undefined,
+        from: giftMessage.from?.trim() || undefined,
         keywords,
         tone: selectedTone,
       };
@@ -57,32 +56,50 @@ const CartPage: React.FC = () => {
       } else {
         setGenerateError('Failed to generate message. Please try again.');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error generating AI message:', error);
-      setGenerateError(error.response?.data?.error || 'Failed to generate message. Please try again.');
+      const errorMessage = error instanceof Error
+        ? error.message
+        : (error as any)?.response?.data?.error || 'Failed to generate message. Please try again.';
+      setGenerateError(errorMessage);
     } finally {
       setIsGenerating(false);
     }
   };
 
-  const calculateTotal = () => {
-    return cartState.total; // Use the cart's built-in total calculation which handles discounts
+  // Helper to calculate price for a cart item
+  const calculateItemPrices = (item: any) => {
+    const originalPrice = item.product.priceCents * item.quantity;
+    const discountedPrice = item.isSubscription && item.subscriptionDiscount
+      ? originalPrice * (1 - item.subscriptionDiscount / 100)
+      : originalPrice;
+    const savings = originalPrice - discountedPrice;
+    return { originalPrice, discountedPrice, savings };
   };
 
   const calculateSavings = () => {
-    return cartState.items.reduce((savings, item) => {
-      if (item.isSubscription && item.subscriptionDiscount) {
-        const originalPrice = item.product.priceCents * item.quantity;
-        const discountedPrice = originalPrice * (1 - item.subscriptionDiscount / 100);
-        return savings + (originalPrice - discountedPrice);
-      }
-      return savings;
+    return cartState.items.reduce((total, item) => {
+      const { savings } = calculateItemPrices(item);
+      return total + savings;
     }, 0);
   };
 
   const formatPrice = (cents: number) => {
     const dollars = Number(cents) / 100;
     return `$${dollars.toFixed(2)}`;
+  };
+
+  const getDeliveryDateText = (item: any) => {
+    if (!item.selectedDate) return null;
+    const formattedDate = format(item.selectedDate, 'PPP');
+
+    if (item.purchaseType === 'spontaneous') {
+      return `First delivery: ${formattedDate} (then random surprise deliveries ${item.subscriptionFrequency})`;
+    }
+    if (item.isSubscription) {
+      return `First delivery: ${formattedDate} (then auto-renews ${item.subscriptionFrequency})`;
+    }
+    return `Delivery: ${formattedDate}`;
   };
 
   if (cartState.items.length === 0) {
@@ -117,15 +134,8 @@ const CartPage: React.FC = () => {
           </div>
 
           {cartState.items.map((item) => {
+            const { originalPrice, discountedPrice, savings } = calculateItemPrices(item);
             const isSubscription = item.isSubscription;
-            const originalPrice = item.product.priceCents * item.quantity;
-            let displayPrice = originalPrice;
-
-            // Calculate discounted price for subscription items
-            if (isSubscription && item.subscriptionDiscount) {
-              displayPrice = originalPrice * (1 - item.subscriptionDiscount / 100);
-            }
-
             const subscriptionOption = isSubscription && item.subscriptionFrequency
               ? SUBSCRIPTION_OPTIONS.find(opt => opt.frequency === item.subscriptionFrequency)
               : null;
@@ -133,9 +143,8 @@ const CartPage: React.FC = () => {
             return (
               <div key={item.id} className={`cart-item ${isSubscription ? 'subscription-item' : 'one-time-item'}`}>
                 <div
-                  className="item-image"
+                  className="item-image clickable"
                   onClick={() => handleProductClick(item.product.id)}
-                  style={{ cursor: 'pointer' }}
                 >
                   <img src={getImageUrl(item.product.imageUrl || '')} alt={item.product.name} />
                   {isSubscription && (
@@ -147,8 +156,8 @@ const CartPage: React.FC = () => {
 
                 <div className="item-description">
                   <h3
+                    className="clickable"
                     onClick={() => handleProductClick(item.product.id)}
-                    style={{ cursor: 'pointer' }}
                   >
                     {item.product.name}
                   </h3>
@@ -165,7 +174,7 @@ const CartPage: React.FC = () => {
                       </span>
                       {item.subscriptionDiscount && (
                         <span className="savings-amount">
-                          Save ${((originalPrice - displayPrice) / 100).toFixed(2)}
+                          Save {formatPrice(savings)}
                         </span>
                       )}
                     </div>
@@ -178,55 +187,55 @@ const CartPage: React.FC = () => {
                   )}
                   {item.selectedDate && (
                     <div className="delivery-date-info">
-                      {item.purchaseType === 'spontaneous'
-                        ? `First delivery: ${format(item.selectedDate, 'PPP')} (then random surprise deliveries ${item.subscriptionFrequency})`
-                        : item.isSubscription
-                        ? `First delivery: ${format(item.selectedDate, 'PPP')} (then auto-renews ${item.subscriptionFrequency})`
-                        : `Delivery: ${format(item.selectedDate, 'PPP')}`
-                      }
+                      {getDeliveryDateText(item)}
                     </div>
                   )}
                 </div>
 
-                <div className="item-quantity">
-                  <div>
-                    <button
-                      className="qty-btn"
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                    >
-                      -
-                    </button>
-                    <span className="qty-value">{item.quantity}</span>
-                    <button
-                      className="qty-btn"
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                    >
-                      +
-                    </button>
+                <div className="item-actions-row">
+                  <div className="item-quantity">
+                    <div>
+                      <button
+                        className="qty-btn"
+                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        aria-label="Decrease quantity"
+                      >
+                        -
+                      </button>
+                      <span className="qty-value">{item.quantity}</span>
+                      <button
+                        className="qty-btn"
+                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        aria-label="Increase quantity"
+                      >
+                        +
+                      </button>
+                    </div>
                   </div>
-                </div>
 
-                <div className="item-price">
-                  <div className="price-display">
-                    <span className="current-price">{formatPrice(displayPrice)}</span>
-                    {isSubscription && item.subscriptionDiscount && (
-                      <span className="original-price">{formatPrice(originalPrice)}</span>
+                  <div className="item-price">
+                    <div className="price-display">
+                      <span className="current-price">{formatPrice(discountedPrice)}</span>
+                      {isSubscription && item.subscriptionDiscount && (
+                        <span className="original-price">{formatPrice(originalPrice)}</span>
+                      )}
+                    </div>
+                    {isSubscription && (
+                      <div className="subscription-frequency">
+                        per {item.subscriptionFrequency?.replace('ly', '') || 'delivery'}
+                      </div>
                     )}
                   </div>
-                  {isSubscription && (
-                    <div className="subscription-frequency">
-                      per {item.subscriptionFrequency?.replace('ly', '')}
-                    </div>
-                  )}
-                </div>
 
-                <div className="item-delete">
-                  <button
-                    className="delete-btn"
-                    onClick={() => removeItem(item.id)}
-                  >
-                    ✕
-                  </button>
+                  <div className="item-delete">
+                    <button
+                      className="delete-btn"
+                      onClick={() => removeItem(item.id)}
+                      aria-label={`Remove ${item.product.name} from cart`}
+                    >
+                      ✕
+                    </button>
+                  </div>
                 </div>
               </div>
             );
@@ -305,7 +314,7 @@ const CartPage: React.FC = () => {
               <h3>Order Summary</h3>
               <div className="summary-line">
                 <span>Subtotal ({cartState.items.length} items)</span>
-                <span>{formatPrice(calculateTotal() + calculateSavings())}</span>
+                <span>{formatPrice(cartState.total + calculateSavings())}</span>
               </div>
               {calculateSavings() > 0 && (
                 <div className="summary-line savings-line">
@@ -315,7 +324,7 @@ const CartPage: React.FC = () => {
               )}
               <div className="summary-line total-line">
                 <span>Total</span>
-                <span className="total-amount">{formatPrice(calculateTotal())}</span>
+                <span className="total-amount">{formatPrice(cartState.total)}</span>
               </div>
               {calculateSavings() > 0 && (
                 <div className="savings-note">

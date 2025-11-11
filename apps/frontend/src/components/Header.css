@@ -3,7 +3,7 @@
     height: 42px;
     background-color:var(--banner-colour-1);
     justify-content: center;
-    display:flex;
+    display:flex; /* Show on desktop */
     align-items:center;
 }
 
@@ -14,6 +14,10 @@
   padding: 8px;
 }
 
+.banner-container {
+    padding: 2rem 0;
+}
+
 .banner-image{
     width: 100%;
     height: 100px;
@@ -22,6 +26,9 @@
     background-position: center;
     background-repeat: no-repeat;
     background-color: var(--banner-colour-1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 /*-----*/
@@ -346,17 +353,195 @@
   }
 }
 
-@media (max-width: 480px) {
-  .top-nav {
-    padding: 0.5rem 1rem;
+/* Mobile Hamburger Menu Button */
+.mobile-menu-toggle {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  /* Hide category menus on mobile - using hamburger menu instead */
+  .banner-menu {
+    display: none;
+  }
+
+  /* Show hamburger menu button on mobile */
+  .mobile-menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-colour);
+    cursor: pointer;
+    padding: 0.5rem;
+    z-index: 1001;
+    transition: opacity 0.2s ease;
+  }
+
+  .mobile-menu-toggle:hover {
+    opacity: 0.7;
+  }
+
+  .banner-container {
+    position: relative;
+  }
+
+  /* Hide Contact Us on mobile - it's in the footer */
+  .top-nav-link[href="/contact"] {
+    display: none;
   }
 
   .top-nav-links {
     gap: 0.75rem;
   }
 
+  .user-name-text {
+    display: none;
+  }
+
+  .auth-button {
+    font-size: 0.85rem;
+    padding: 0.25rem 0.5rem;
+  }
+}
+
+/* Mobile Menu Overlay */
+.mobile-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1100;
+  animation: fadeIn 0.3s ease;
+}
+
+/* Mobile Menu Sidebar */
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 75%;
+  max-width: 320px;
+  height: 100vh;
+  background: white;
+  z-index: 1101;
+  padding: 1.5rem;
+  overflow-y: auto;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  animation: slideInLeft 0.3s ease;
+}
+
+
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.mobile-menu-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: #333;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: background 0.2s ease;
+}
+
+.mobile-menu-close:hover {
+  background: #f0f0f0;
+}
+
+.mobile-menu-nav {
+  margin-top: 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.mobile-menu-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.mobile-menu-section h3 {
+  font-family: var(--primary-font-web-copy);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-colour);
+  margin: 0 0 0.5rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--banner-colour-1);
+}
+
+.mobile-menu-section a {
+  font-family: var(--primary-font-body-copy);
+  color: var(--text-colour);
+  text-decoration: none;
+  padding: 0.75rem 0.5rem;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+  font-size: 0.9375rem;
+  position: relative;
+  display: block;
+}
+
+.mobile-menu-section a:hover {
+  background: var(--button-colour1);
+  color: var(--button-colour3);
+  transform: translateX(4px);
+}
+
+.mobile-menu-section a:active {
+  background: var(--button-colour3);
+  color: var(--button-colour1);
+  transform: scale(0.95);
+  transition: all 0.05s ease;
+}
+
+@media (max-width: 480px) {
+  .top-nav {
+    padding: 0.5rem 1rem;
+  }
+
+  .top-nav-links {
+    gap: 0.5rem;
+  }
+
   .top-nav-link {
+    font-size: 0.7rem;
+  }
+
+  .cart-counter {
     font-size: 0.75rem;
+  }
+
+  .cart-icon-wrapper svg {
+    width: 20px;
+    height: 20px;
   }
 
   .main-menu,

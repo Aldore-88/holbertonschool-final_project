@@ -100,7 +100,7 @@
   color: #374151;
   font-weight: 500;
 }
-/* 
+/*
 /* Main Content Layout */
 .product-detail-content {
   display: grid;
@@ -132,7 +132,7 @@
 }
 
 .image-placeholder {
-  
+
   width: 100%;
   max-width: 500px;
   aspect-ratio: 1;
@@ -576,6 +576,28 @@
     padding: 2rem;
   }
 
+  /* Fix image positioning for tablet/small desktop */
+  .product-image-section {
+    position: relative;
+    top: auto;
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .product-image {
+    width: 100%;
+    height: auto;
+    max-height: 700px;
+    object-fit: contain;
+  }
+
+  .product-details-section {
+    margin-right: 0;
+  }
+
   .product-title {
     font-family: "EB Garamond", sans-serif;
     font-size: 1.875rem;
@@ -588,11 +610,65 @@
 
 @media (max-width: 768px) {
   .container {
-    padding: 0 0.5rem;
+    padding: 0;
+    max-width: 100%;
   }
 
   .product-detail-content {
-    padding: 1.5rem;
+    /* padding: 1.5rem; */
+    gap: 1.5rem;
+  }
+
+  /* Remove sticky positioning and margins on mobile */
+  .product-image-section {
+    position: relative;
+    top: auto;
+    width: 100%;
+    height: auto;
+    margin-left: 0;
+    margin-bottom: 1rem;
+  }
+
+  .product-image {
+    width: 100%;
+    height: auto;
+    max-height: 500px;
+    object-fit: cover;
+    border-radius: 12px;
+  }
+
+  /* Remove large right margin on mobile */
+  .product-details-section {
+    margin-right: 0;
+    gap: 1.5rem;
+  }
+
+  .header-top {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+
+  .product-title {
+    font-size: 1.75rem;
+  }
+
+  .product-price {
+    font-size: 1.75rem;
+  }
+
+  .likes-count {
+    font-size: 0.875rem;
+  }
+
+  /* Purchase type buttons - keep 3 columns but reduce padding */
+  .purchase-type-grid {
+    gap: 0.5rem;
+  }
+
+  .purchase-type-btn {
+    padding: 0.75rem 0.35rem;
+    font-size: 0.9rem;
   }
 
   .purchase-type-toggle {
@@ -603,13 +679,43 @@
     padding: 1rem;
   }
 
+  .frequency-option-card {
+    padding: 0.875rem 1rem;
+  }
+
+  .frequency-option-label {
+    font-size: 0.9375rem;
+  }
+
+  .frequency-option-description {
+    font-size: 0.8125rem;
+  }
+
+  .frequency-option-price {
+    font-size: 1rem;
+  }
+
   .option-price {
     margin-left: 0;
     margin-top: 0.5rem;
   }
 
-  .product-title {
-    font-size: 1.5rem;
+  .add-to-cart-btn {
+    font-size: 1.25rem;
+    padding: 1rem 1.5rem;
+  }
+
+  .accordion-header {
+    font-size: 1.375rem;
+    padding: 1rem 0;
+  }
+
+  .accordion-content h4 {
+    font-size: 1.125rem;
+  }
+
+  .accordion-content p {
+    font-size: 0.875rem;
   }
 
   .current-price {
@@ -617,6 +723,30 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .product-detail-content {
+    padding: 0.75rem;
+  }
+
+  .product-title {
+    font-size: 1.5rem;
+  }
+
+  .product-price {
+    font-size: 1.5rem;
+  }
+
+  .purchase-type-btn {
+    font-size: 0.8rem;
+    padding: 0.6rem 0.25rem;
+  }
+
+  .add-to-cart-btn {
+    font-size: 1.125rem;
+    padding: 0.875rem 1.25rem;
   }
 }
 
@@ -750,6 +880,7 @@
 
 .similar-product-image {
   aspect-ratio: 4/3;
+  /* padding: 0.75rem; */
   overflow: hidden;
   cursor: pointer;
   background-color: #f9fafb;
@@ -762,6 +893,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* border-radius: 8px; */
   transition: transform 0.2s ease;
 }
 

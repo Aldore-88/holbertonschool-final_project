@@ -124,6 +124,8 @@
   margin-bottom: 2rem;
   text-align: left;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .item-image-container {
@@ -156,6 +158,8 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .item-header {
@@ -163,7 +167,8 @@
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 1rem;
-  width: 600px;
+  width: 100%;
+  max-width: 600px;
 }
 
 .item-header h3 {
@@ -345,12 +350,12 @@
 
 .payment-shipping-methods {
   display: flex;
-  width: 698.91px;
+  width: 100%;
+  max-width: 700px;
   gap: 13.5rem;
   justify-content: flex-start;
+  padding: 1rem;;
   margin: auto;
-  padding-top: 2rem;
-  /* border-top: 1px solid #e5e5e0; */
 }
 
 .method-column h3 {
@@ -433,40 +438,221 @@
 }
 
 /* Responsive */
+@media (max-width: 1024px) {
+  .header-section h1,
+  .order-summary-section h2,
+  .billing-shipping-section h2 {
+    font-size: 2.5rem;
+  }
+
+  .info-column h3,
+  .method-column h3 {
+    font-size: 1.75rem;
+  }
+
+  .info-grid {
+    gap: 4rem;
+  }
+
+  .payment-shipping-methods {
+    width: 100%;
+    gap: 4rem;
+  }
+
+  .item-header {
+    width: 100%;
+  }
+}
+
 @media (max-width: 768px) {
+  .logo-section {
+    padding: 1.5rem 0;
+  }
+
+  .header-section {
+    padding: 1.5rem 1rem;
+    margin-bottom: 2rem;
+  }
+
   .header-section h1 {
+    font-size: 2rem;
+  }
+
+  .order-summary-section {
+    padding: 1.5rem 1rem;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .order-summary-section h2,
+  .billing-shipping-section h2 {
     font-size: 2rem;
   }
 
   .order-item-card {
     flex-direction: column;
     gap: 1.5rem;
-    padding: 1.5rem;
+    padding: 1.5rem 1rem;
+    max-width: 700px;
+    width: 100%;
   }
 
   .item-image-container {
     width: 100%;
     max-width: 300px;
+    height: 350px;
     margin: 0 auto;
   }
 
   .item-header {
     flex-direction: column;
     gap: 0.5rem;
+    width: 100%;
   }
 
   .item-header .item-price {
     margin-left: 0;
   }
 
-  .info-grid,
-  .payment-shipping-methods {
+  .info-grid {
     grid-template-columns: 1fr;
+    gap: 2rem;
+    padding-top: 1.5rem;
+  }
+
+  .info-column h3,
+  .method-column h3 {
+    font-size: 1.5rem;
+  }
+
+  .payment-shipping-methods {
+    flex-direction: column;
+    width: 100%;
+    gap: 2rem;
+    padding-top: 1.5rem;
+  }
+
+  .shipping-row {
     gap: 2rem;
   }
 
   .price-breakdown {
     align-self: flex-start;
     min-width: 100%;
+  }
+
+  .action-buttons {
+    padding: 1.5rem 1rem 2rem 1rem;
+  }
+
+  .back-home-btn {
+    width: 100%;
+    max-width: 400px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-section {
+    padding: 1rem 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .header-section h1 {
+    font-size: 1.75rem;
+  }
+
+  .order-number-highlight {
+    padding: 0.5rem 1rem;
+  }
+
+  .order-number-label {
+    font-size: 0.85rem;
+  }
+
+  .order-number-value {
+    font-size: 1rem;
+  }
+
+  .thank-you-message {
+    font-size: 1rem;
+  }
+
+  .info-message {
+    font-size: 0.875rem;
+  }
+
+  .order-summary-section {
+    padding: 1rem 0.75rem;
+  }
+
+  .order-summary-section h2,
+  .billing-shipping-section h2 {
+    font-size: 1.75rem;
+  }
+
+  .order-date {
+    font-size: 0.875rem;
+  }
+
+  .order-item-card {
+    padding: 1rem 0.75rem;
+    gap: 1rem;
+  }
+
+  .item-image-container {
+    max-width: 250px;
+    height: 300px;
+  }
+
+  .item-header h3 {
+    font-size: 1.25rem;
+  }
+
+  .item-header .item-price {
+    font-size: 1.25rem;
+  }
+
+  .item-info-list p {
+    font-size: 0.875rem;
+  }
+
+  .price-row {
+    font-size: 0.9rem;
+  }
+
+  .total-row {
+    font-size: 1rem;
+  }
+
+  .info-column h3,
+  .method-column h3 {
+    font-size: 1.25rem;
+  }
+
+  .info-column p,
+  .method-column p {
+    font-size: 0.875rem;
+  }
+
+  .shipping-row {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .breakdown-toggle {
+    font-size: 0.75rem;
+  }
+
+  .breakdown-item {
+    font-size: 0.8rem;
+  }
+
+  .action-buttons {
+    padding: 1rem 0.75rem;
+  }
+
+  .back-home-btn {
+    width: 100%;
+    padding: 0.875rem 2rem;
   }
 }

@@ -10,6 +10,7 @@ on:
       - 'pnpm-workspace.yaml'
       - '.github/workflows/deploy-frontend.yml'
       - '.dockerignore'
+      - 'terraform/**'
 
 env:
   S3_BUCKET: flora-frontend-production-b001bddb
