@@ -89,7 +89,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         appState: { returnTo }
       });
     },
-    logout: () => logout(),
+    logout: () => {
+      console.log('🚪 Logging out, will return to:', window.location.origin);
+      logout({
+        logoutParams: {
+          returnTo: window.location.origin
+        }
+      });
+    },
     getAccessToken,
   };
 
