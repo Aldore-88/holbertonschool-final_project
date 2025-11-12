@@ -3,6 +3,7 @@ import type { Product } from '../types';
 import { useCart } from '../contexts/CartContext';
 import { getImageUrl } from '../services/api';
 import { SUBSCRIPTION_OPTIONS, calculateSubscriptionPrice, formatSubscriptionSavings } from '../config/subscriptionConfig';
+import { logger } from '../utils/logger';
 import './ProductModal.css';
 
 interface ProductModalProps {
@@ -71,7 +72,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onClose })
   };
 
   // Debug logging
-  console.log('ProductModal state:', { isSubscription, selectedFrequency, quantity });
+  logger.log('ProductModal state:', { isSubscription, selectedFrequency, quantity });
 
   const getSubscriptionInfo = () => {
     if (!isSubscription) return null;

@@ -14,6 +14,7 @@ import OrderHistory from "./pages/OrderHistory";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/Checkout";
 import OrderConfirmationPage from "./pages/OrderConfirmationPage";
+import { logger } from "./utils/logger";
 
 
 function App() {
@@ -30,9 +31,9 @@ function App() {
     if (user) {
       getAccessToken().then((token) => {
         if (token) {
-          console.log("Auth0 token: ", token);
+          logger.log("Auth0 token received");
         } else {
-          console.log("No Auth0 token found");
+          logger.log("No Auth0 token found");
         }
       });
     }
@@ -42,19 +43,19 @@ function App() {
     try {
       setLoading(true);
       const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3001/api";
-      console.log("🔍 Checking API status:", `${apiUrl}/health`);
+      logger.log("🔍 Checking API status:", `${apiUrl}/health`);
 
       const response = await fetch(`${apiUrl}/health`);
 
       if (response.ok) {
-        console.log("✅ API is available");
+        logger.log("✅ API is available");
         setUseAPI(true);
       } else {
-        console.log("ℹ️ API not responding properly");
+        logger.log("ℹ️ API not responding properly");
         setUseAPI(false);
       }
     } catch (err) {
-      console.log("ℹ️ API not available:", err);
+      logger.log("ℹ️ API not available:", err);
       setUseAPI(false);
     } finally {
       setLoading(false);
@@ -91,7 +92,7 @@ function AppContent({ useAPI }: any) {
       const returnTo = sessionStorage.getItem("auth_return_to");
 
       if (returnTo) {
-        console.log("📍 Navigating to saved location:", returnTo);
+        logger.log("📍 Navigating to saved location:", returnTo);
         sessionStorage.removeItem("auth_return_to");
 
         // Small delay to ensure Auth0 has fully processed

@@ -1,3 +1,5 @@
+import { logger } from '../utils/logger';
+
 export interface DeliveryInfo {
   serviceArea: {
     name: string;
@@ -43,7 +45,7 @@ export const deliveryService = {
 
       return data.data;
     } catch (error) {
-      console.error('Error fetching delivery info:', error);
+      logger.error('Error fetching delivery info:', error);
       // Fallback to default values if API fails
       return {
         serviceArea: {
@@ -84,7 +86,7 @@ export const deliveryService = {
 
       return data.data;
     } catch (error) {
-      console.error('Error validating postcode:', error);
+      logger.error('Error validating postcode:', error);
       // Fallback - assume delivery is available
       return {
         postcode,

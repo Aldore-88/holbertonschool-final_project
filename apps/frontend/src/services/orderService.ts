@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { logger } from '../utils/logger';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
@@ -128,7 +129,7 @@ class OrderService {
     try {
       return await requestFn();
     } catch (error) {
-      console.error(errorMessage, error);
+      logger.error(errorMessage, error);
       throw error;
     }
   }

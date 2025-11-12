@@ -7,6 +7,7 @@ import type { CreateSubscriptionData } from '../services/subscriptionService';
 import type { CheckoutFormData } from '../components/CheckoutForm';
 import type { CartItem } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
+import { logger } from '../utils/logger';
 
 // Type mapping functions
 const mapSubscriptionType = (
@@ -56,7 +57,7 @@ export const useCheckout = (): UseCheckoutReturn => {
       // Identify subscription items (for creating subscription records for future deliveries)
       const subscriptionItems = cartItems.filter(item => item.isSubscription);
 
-      console.log('🛒 Processing cart:', {
+      logger.log('🛒 Processing cart:', {
         totalItems: cartItems.length,
         subscriptionCount: subscriptionItems.length
       });
@@ -93,7 +94,7 @@ export const useCheckout = (): UseCheckoutReturn => {
       const token = await getAccessToken();
 
       // Build billing address based on checkbox
-      console.log('💳 Billing Address Logic:', {
+      logger.log('💳 Billing Address Logic:', {
         useSameAddress: formData.useSameAddress,
         senderFirstName: formData.senderFirstName,
         senderLastName: formData.senderLastName,
@@ -122,7 +123,7 @@ export const useCheckout = (): UseCheckoutReturn => {
         phone: formData.senderPhone,
       };
 
-      console.log('💳 Built billing address:', billingAddress);
+      logger.log('💳 Built billing address:', billingAddress);
 
       const orderData: CreateOrderData = {
         purchaseType: 'ONE_TIME', // First order is always one-time, subscriptions are for future
@@ -146,21 +147,21 @@ export const useCheckout = (): UseCheckoutReturn => {
         deliveryType: formData.deliveryType || 'STANDARD',
       };
 
-      console.log('📦 Creating order with all items:', JSON.stringify(orderData, null, 2));
-      console.log('🔑 User logged in:', !!user, 'User ID:', user?.sub);
+      logger.log('📦 Creating order with all items');
+      logger.log('🔑 User logged in:', !!user, 'User ID:', user?.sub);
       const order = await orderService.createOrder(orderData, token);
-      console.log('Order created:', order);
+      logger.log('Order created:', order);
 
       totalOrderId = order.id;
 
       // Create payment intent for the full order
       const totalInDollars = order.totalCents / 100;
-      console.log('Creating payment intent for amount:', totalInDollars);
+      logger.log('Creating payment intent for amount:', totalInDollars);
       const paymentIntent = await paymentService.createPaymentIntent({
         orderId: order.id,
         amount: totalInDollars,
       });
-      console.log('Payment intent created:', paymentIntent);
+      logger.log('Payment intent created successfully');
       totalClientSecret = paymentIntent.clientSecret;
 
       // Create subscription records for future recurring deliveries
@@ -196,19 +197,19 @@ export const useCheckout = (): UseCheckoutReturn => {
             }],
           };
 
-          console.log(`🔄 Creating subscription record for future deliveries: ${item.product.name}`);
+          logger.log(`🔄 Creating subscription record for future deliveries: ${item.product.name}`);
 
           // Create subscription record for future recurring deliveries
           const subscription = await subscriptionService.createSubscription(subscriptionData, token);
-          console.log(`Subscription created for ${item.product.name}:`, subscription);
+          logger.log(`Subscription created for ${item.product.name}:`, subscription);
         }
       }
 
       setOrderId(totalOrderId);
       setClientSecret(totalClientSecret);
     } catch (err: any) {
-      console.error('Checkout error:', err);
-      console.error('Error response:', err.response?.data);
+      logger.error('Checkout error:', err);
+      logger.error('Error response:', err.response?.data);
       setError(err.response?.data?.error || err.message || 'An error occurred');
     } finally {
       setIsProcessing(false);
@@ -216,13 +217,13 @@ export const useCheckout = (): UseCheckoutReturn => {
   };
 
   const handlePaymentSuccess = () => {
-    console.log('Payment successful!');
+    logger.log('Payment successful!');
     // Redirect is handled by Stripe confirmPayment
   };
 
   const handlePaymentError = (errorMsg: string) => {
     setError(errorMsg);
-    console.error('Payment error:', errorMsg);
+    logger.error('Payment error:', errorMsg);
   };
 
   return {

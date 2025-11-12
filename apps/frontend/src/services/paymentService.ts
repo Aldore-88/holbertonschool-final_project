@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { logger } from '../utils/logger';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
@@ -30,7 +31,7 @@ class PaymentService {
       });
       return response.data.data;
     } catch (error) {
-      console.error('Error creating payment intent:', error);
+      logger.error('Error creating payment intent:', error);
       throw error;
     }
   }
@@ -48,7 +49,7 @@ class PaymentService {
       );
       return response.data.data;
     } catch (error) {
-      console.error('Error confirming payment:', error);
+      logger.error('Error confirming payment:', error);
       throw error;
     }
   }
@@ -61,7 +62,7 @@ class PaymentService {
       });
       return response.data.data;
     } catch (error) {
-      console.error('Error fetching payment:', error);
+      logger.error('Error fetching payment:', error);
       throw error;
     }
   }

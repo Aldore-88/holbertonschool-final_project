@@ -5,6 +5,7 @@ import { useAuth } from "../contexts/AuthContext";
 import orderService from "../services/orderService";
 import type { Order } from "../services/orderService";
 import { getImageUrl } from "../services/api";
+import { logger } from "../utils/logger";
 import "../styles/OrderConfirmationPage.css";
 
 const OrderConfirmationPage: React.FC = () => {
@@ -23,7 +24,7 @@ const OrderConfirmationPage: React.FC = () => {
         try {
           token = await getAccessToken();
         } catch (tokenError) {
-          console.warn("Unable to get auth token for order fetch:", tokenError);
+          logger.warn("Unable to get auth token for order fetch:", tokenError);
         }
       }
 
@@ -31,7 +32,7 @@ const OrderConfirmationPage: React.FC = () => {
       setOrder(orderData);
       setError(null);
     } catch (err: any) {
-      console.error("Error fetching order:", err);
+      logger.error("Error fetching order:", err);
       if (user && !token) {
         setError("We couldn't verify your order. Please refresh and sign in again.");
       } else {

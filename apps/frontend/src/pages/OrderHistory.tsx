@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import orderService from '../services/orderService';
 import type { Order, OrdersResponse } from '../services/orderService';
 import { getImageUrl } from '../services/api';
+import { logger } from '../utils/logger';
 import '../styles/OrderHistory.css';
 
 const OrderHistory = () => {
@@ -29,26 +30,26 @@ const OrderHistory = () => {
         setLoading(true);
         setError(null);
 
-        console.log('🔍 DEBUG: Fetching orders for user:', user.sub, user.email);
+        logger.log('🔍 DEBUG: Fetching orders for user:', user.sub, user.email);
         const token = await getAccessToken();
         if (!token) {
           throw new Error('No access token available');
         }
 
-        console.log('🔑 DEBUG: Got access token, length:', token.length);
+        logger.log('🔑 DEBUG: Got access token, length:', token.length);
         const response: OrdersResponse = await orderService.getUserOrders(
           token,
           currentPage,
           ITEMS_PER_PAGE
         );
 
-        console.log('📊 DEBUG: Order history response:', response);
+        logger.log('📊 DEBUG: Order history response:', response);
         setOrders(response.data || []);
         setTotal(response.total || 0);
         setTotalPages(response.totalPages || 1);
       } catch (err: any) {
-        console.error('❌ Error fetching orders:', err);
-        console.error('❌ Error response:', err.response?.data);
+        logger.error('❌ Error fetching orders:', err);
+        logger.error('❌ Error response:', err.response?.data);
         setError(err.message || 'Failed to load order history');
       } finally {
         setLoading(false);

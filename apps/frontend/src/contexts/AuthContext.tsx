@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useEffect, useRef } from 'react';
 import { useAuth0, User as Auth0User } from '@auth0/auth0-react';
 import userService from '../services/userService';
+import { logger } from '../utils/logger';
 
 // Define the shape of our context
 interface AuthContextType {
@@ -55,18 +56,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       // 3. We haven't already synced this session
       if (user && !isLoading && !hasSyncedRef.current) {
         try {
-          console.log('🔄 Auto-syncing user to database:', user.sub);
+          logger.log('🔄 Auto-syncing user to database:', user.sub);
           const token = await getAccessToken();
-          console.log('🔑 Got access token:', token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
+          logger.log('🔑 Got access token:', token ? 'Token received' : 'NO TOKEN');
           if (token) {
             await userService.syncUser(token);
             hasSyncedRef.current = true;
-            console.log('✅ User synced successfully');
+            logger.log('✅ User synced successfully');
           } else {
-            console.error('❌ No access token available');
+            logger.error('❌ No access token available');
           }
         } catch (error) {
-          console.error('❌ Failed to sync user:', error);
+          logger.error('❌ Failed to sync user:', error);
           // Don't block login on sync failure - user can still use the app
         }
       }
@@ -82,7 +83,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     loading: isLoading,
     login: () => {
       const returnTo = window.location.pathname;
-      console.log('🔐 Login initiated from:', returnTo);
+      logger.log('🔐 Login initiated from:', returnTo);
       // Save to sessionStorage as backup
       sessionStorage.setItem('auth_return_to', returnTo);
       loginWithRedirect({
@@ -90,7 +91,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       });
     },
     logout: () => {
-      console.log('🚪 Logging out, will return to:', window.location.origin);
+      logger.log('🚪 Logging out, will return to:', window.location.origin);
       logout({
         logoutParams: {
           returnTo: window.location.origin
