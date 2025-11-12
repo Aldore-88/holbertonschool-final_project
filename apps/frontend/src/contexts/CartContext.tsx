@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 import type { Product } from '../types';
+import { logger } from '../utils/logger';
 
 export interface CartItem {
   id: string;
@@ -225,7 +226,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
           dispatch({ type: 'LOAD_CART', payload: normalizedCart });
         }
       } catch (error) {
-        console.error('Error loading cart from localStorage:', error);
+        logger.error('Error loading cart from localStorage:', error);
       }
     }
 
@@ -235,7 +236,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
         const parsedMessage = JSON.parse(savedGiftMessage);
         dispatch({ type: 'SET_GIFT_MESSAGE', payload: parsedMessage });
       } catch (error) {
-        console.error('Error loading gift message from localStorage:', error);
+        logger.error('Error loading gift message from localStorage:', error);
       }
     }
 

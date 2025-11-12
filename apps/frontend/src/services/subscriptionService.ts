@@ -1,3 +1,5 @@
+import { logger } from '../utils/logger';
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 // Helper function to create auth headers
@@ -76,7 +78,7 @@ class SubscriptionService {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      console.error('Subscription creation failed:', errorData);
+      logger.error('Subscription creation failed:', errorData);
       throw new Error(errorData.error || errorData.message || `Failed to create subscription: ${response.status}`);
     }
 

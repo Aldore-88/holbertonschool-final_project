@@ -7,6 +7,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useCheckout } from '../hooks/useCheckout';
 import deliveryService, { type DeliveryInfo } from '../services/deliveryService';
 import type { CheckoutFormData } from '../components/CheckoutForm';
+import { logger } from '../utils/logger';
 import '../styles/CheckoutPage.css';
 
 const CheckoutPage: React.FC = () => {
@@ -30,7 +31,7 @@ const CheckoutPage: React.FC = () => {
         const info = await deliveryService.getDeliveryInfo();
         setDeliveryInfo(info);
       } catch (error) {
-        console.error('Failed to fetch delivery info:', error);
+        logger.error('Failed to fetch delivery info:', error);
       }
     };
 
@@ -52,7 +53,7 @@ const CheckoutPage: React.FC = () => {
   };
 
   const handlePaymentError = (error: string) => {
-    console.error('Payment error:', error);
+    logger.error('Payment error:', error);
   };
 
   if (state.items.length === 0) {

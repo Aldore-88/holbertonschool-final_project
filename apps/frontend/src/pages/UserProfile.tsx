@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import userService from '../services/userService';
 import type { UserProfile as UserProfileData } from '../services/userService';
 import '../styles/UserProfile.css';
+import { logger } from '../utils/logger';
 
 const UserProfile = () => {
   const { user: auth0User, loading: authLoading, getAccessToken } = useAuth();
@@ -26,17 +27,17 @@ const UserProfile = () => {
 
       try {
         const token = await getAccessToken();
-        console.log('🔑 UserProfile got token:', token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
+        logger.log('🔑 UserProfile got token:', token ? 'Token received' : 'NO TOKEN');
         if (!token) throw new Error('No access token');
 
-        console.log('📥 Fetching user profile from database');
+        logger.log('📥 Fetching user profile from database');
         const profileData = await userService.getProfile(token);
-        console.log('✅ Profile loaded:', profileData);
+        logger.log('✅ Profile loaded:', profileData);
 
         setProfile(profileData);
         setPhoneValue(profileData.phone || '');
       } catch (err: any) {
-        console.error('❌ Profile fetch error:', err);
+        logger.error('❌ Profile fetch error:', err);
         setError(err.message || 'Failed to load profile');
       } finally {
         setLoading(false);
@@ -60,16 +61,16 @@ const UserProfile = () => {
       const token = await getAccessToken();
       if (!token) throw new Error('No access token');
 
-      console.log('💾 Saving phone number:', phoneValue);
+      logger.log('💾 Saving phone number:', phoneValue);
       const updated = await userService.updateProfile(token, {
         phone: phoneValue,
       });
 
       setProfile(updated);
       setIsEditingPhone(false);
-      console.log('✅ Phone number saved');
+      logger.log('✅ Phone number saved');
     } catch (err: any) {
-      console.error('❌ Save error:', err);
+      logger.error('❌ Save error:', err);
       alert(err.message || 'Failed to save phone number');
     } finally {
       setIsSaving(false);

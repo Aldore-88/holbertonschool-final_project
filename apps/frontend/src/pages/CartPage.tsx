@@ -4,6 +4,7 @@ import { useCart } from '../contexts/CartContext';
 import { getImageUrl, apiService } from '../services/api';
 import { SUBSCRIPTION_OPTIONS } from '../config/subscriptionConfig';
 import { format } from 'date-fns';
+import { logger } from '../utils/logger';
 import '../styles/CartPage.css';
 
 const CartPage: React.FC = () => {
@@ -57,7 +58,7 @@ const CartPage: React.FC = () => {
         setGenerateError('Failed to generate message. Please try again.');
       }
     } catch (error: unknown) {
-      console.error('Error generating AI message:', error);
+      logger.error('Error generating AI message:', error);
       const errorMessage = error instanceof Error
         ? error.message
         : (error as any)?.response?.data?.error || 'Failed to generate message. Please try again.';

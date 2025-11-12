@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import apiService from '../services/api';
 import type { Product, FilterOptions, ProductResponse } from '../types';
+import { logger } from '../utils/logger';
 
 export const useProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -17,7 +18,7 @@ export const useProducts = () => {
         setError(null);
       } catch (err) {
         setError('Failed to fetch products');
-        console.error('Error fetching products:', err);
+        logger.error('Error fetching products:', err);
       } finally {
         setLoading(false);
       }
@@ -34,7 +35,7 @@ export const useProducts = () => {
       setError(null);
     } catch (err) {
       setError('Failed to fetch products');
-      console.error('Error fetching products:', err);
+      logger.error('Error fetching products:', err);
     } finally {
       setLoading(false);
     }
@@ -62,7 +63,7 @@ export const useProduct = (id: string | undefined) => {
         setError(null);
       } catch (err) {
         setError('Failed to fetch product');
-        console.error('Error fetching product:', err);
+        logger.error('Error fetching product:', err);
       } finally {
         setLoading(false);
       }
@@ -95,7 +96,7 @@ export const useProductsByCategory = (categoryId: string | undefined) => {
         setError(null);
       } catch (err) {
         setError('Failed to fetch products');
-        console.error('Error fetching products:', err);
+        logger.error('Error fetching products:', err);
       } finally {
         setLoading(false);
       }
@@ -218,7 +219,7 @@ export const useProductsWithFilters = (options: UseProductsWithFiltersOptions = 
         setFilterOptions(response.filters);
       }
     } catch (err) {
-      console.error('Error fetching products:', err);
+      logger.error('Error fetching products:', err);
       setError('Failed to load products. Please try again.');
     } finally {
       setIsLoading(false);

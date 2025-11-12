@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { logger } from '../utils/logger';
 
 /**
  * SearchBar Component
@@ -78,7 +79,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         setShowSuggestions(false);
       }
     } catch (error) {
-      console.error('Error fetching search suggestions:', error);
+      logger.error('Error fetching search suggestions:', error);
       setSuggestions([]);
       setShowSuggestions(false);
     } finally {

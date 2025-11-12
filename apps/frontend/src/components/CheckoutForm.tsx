@@ -6,6 +6,7 @@ import PaymentForm from "./PaymentForm";
 import { useAuth } from "../contexts/AuthContext";
 import { useCart } from "../contexts/CartContext";
 import deliveryService, { type DeliveryInfo } from "../services/deliveryService";
+import { logger } from "../utils/logger";
 import "../styles/CheckoutForm.css";
 
 // Initialize Stripe
@@ -199,7 +200,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
         }
       } catch (error) {
         // Graceful degradation: if validation service fails, allow checkout to continue
-        console.warn("Postcode validation service unavailable, allowing checkout:", error);
+        logger.warn("Postcode validation service unavailable, allowing checkout:", error);
         // No error added - we don't block checkout for technical failures
       }
     }
