@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import type { Product } from '../types';
 import { useCart } from '../contexts/CartContext';
 import { getImageUrl } from '../services/api';
+// @ts-ignore - logger is used for debugging
 import { logger } from '../utils/logger';
 import './ProductCard.css';
 
