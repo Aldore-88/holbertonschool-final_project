@@ -9,20 +9,17 @@ export default defineConfig({
     outDir: 'dist',
     assetsDir: 'assets',
     sourcemap: false,
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        // Remove console.log, console.info, console.debug in production
-        drop_console: ['log', 'info', 'debug'],
-        // Keep console.error and console.warn for critical issues
-        pure_funcs: [],
-      },
-    },
+    minify: 'esbuild', // Use esbuild instead of terser for better compatibility
     rollupOptions: {
       output: {
         manualChunks: undefined,
       },
     },
+  },
+  esbuild: {
+    // Remove console logs in production
+    drop: ['console', 'debugger'],
+    // But this will be overridden by our logger utility in development
   },
   server: {
     port: 5173,
